@@ -50,6 +50,11 @@ class AuthUserMiddleware(BaseMiddleware):
             )).fetchone()
 
         if not db_user[0].is_whitelisted:
+            await data['bot'].send_message(
+                user.id,
+                'You are not whitelisted in this bot. '
+                'Request access from the bot administrator or <a href="https://github.com/teleportx/LobzikAI">host your own bot</a>.',
+            )
             return None
 
         data['user'] = db_user[0]
