@@ -14,6 +14,10 @@ import config
 
 import handlers
 import middlewares
+import setup_logger
+
+
+setup_logger.__init__('Service bot')
 
 dp = Dispatcher()
 bot = Bot(config.bot_token, default=DefaultBotProperties(parse_mode='html'))

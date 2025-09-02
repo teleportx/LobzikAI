@@ -10,6 +10,10 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 import db
 import handlers
+import setup_logger
+
+
+setup_logger.__init__('Service web')
 
 
 class DatabaseMiddleware(BaseHTTPMiddleware):
