@@ -10,3 +10,12 @@ services:
       - "127.0.0.1:22546:5432"
     volumes:
       - ./.devdata/postgres:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "127.0.0.1:40601:5672"
+      - "127.0.0.1:12516:15672"
+    volumes:
+      - ./.devdata/rabbitmq:/var/lib/rabbitmq

@@ -7,3 +7,4 @@ psycopg2-binary==2.9.10
 asyncpg==0.30.0
 aiogram==3.22.0
 loguru==0.7.3
+aiormq==6.9.0
