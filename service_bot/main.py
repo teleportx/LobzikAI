@@ -11,6 +11,7 @@ import db
 import config
 
 import handlers
+import middlewares
 
 dp = Dispatcher()
 bot = Bot(config.bot_token)
@@ -22,6 +23,7 @@ async def start_polling():
     await dp.start_polling(bot)
 
 
+middlewares.setup(dp)
 dp.include_router(handlers.router)
 
 if __name__ == "__main__":
