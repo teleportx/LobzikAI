@@ -16,5 +16,5 @@ async def send_audio_to_process(owner_id: int, file_id: str):
 
     await channel.basic_publish(
         body,
-        routing_key='audio_to_process'
+        routing_key='lecture_to_process'
     )
