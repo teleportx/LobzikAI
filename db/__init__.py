@@ -1,4 +1,5 @@
 from .base import BaseDBModel, start
 from . import base
 
-from .lesson import Lesson
+from .user import User
+from .lecture import Lecture

@@ -19,8 +19,8 @@ async def handle_lesson_html(request: Request, lesson_id: int):
 @router.get('/{lesson_id}/data')
 async def handle_lesson_data(request: Request, lesson_id: int):
     lesson = (await request.state.db.execute(
-        select(db.Lesson.summarized_text)
-        .where(db.Lesson.id == lesson_id)
+        select(db.Lecture.summarized_text)
+        .where(db.Lecture.id == lesson_id)
     )).fetchone()
 
     if lesson is None:
