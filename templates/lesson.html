@@ -39,8 +39,16 @@
 
   <script>
     // == Настройка: поместите сюда ваш Markdown в переменную MARKDOWN ==
-    const MARKDOWN = `# Aboba`;
+    let MARKDOWN = ``;
+    const lesson_id = {{lesson_id}};
 
+    let get_text = async () => {
+      let res = await fetch(`/lesson/${lesson_id}/data`)
+      const data = await res.json();
+
+      MARKDOWN = data['summarized_text'];
+      console.log(MARKDOWN);
+    }
 
     // Marked + DOMPurify + highlight.js
     marked.setOptions({ gfm: true, breaks: true, headerIds: true, mangle: false, smartLists: true, highlight: (code, lang) => {
@@ -61,7 +69,8 @@
     }
 
     // Рендерим MARKDOWN сразу
-    render(MARKDOWN);
+    get_text().then(() => render(MARKDOWN));
+
 
     // Экспорт: удобно менять MARKDOWN извне (например, из devtools)
     window.setMarkdown = (md) => { render(md); };

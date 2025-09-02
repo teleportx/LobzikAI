@@ -1,15 +1,19 @@
 from fastapi import APIRouter, HTTPException
 from sqlalchemy import select
 from starlette.requests import Request
+from starlette.templating import Jinja2Templates
 
 import db
 
 router = APIRouter(prefix='/lesson')
+templates = Jinja2Templates('templates')
 
 
 @router.get('/{lesson_id}')
-async def handle_lesson_html(lesson_id: int):
-    ...
+async def handle_lesson_html(request: Request, lesson_id: int):
+    return templates.TemplateResponse(request=request, name='lesson.html', context={
+        'lesson_id': lesson_id,
+    })
 
 
 @router.get('/{lesson_id}/data')
