@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from . import lesson
+from . import lecture
 
 router = APIRouter()
 
-router.include_router(lesson.router)
+router.include_router(lecture.router)

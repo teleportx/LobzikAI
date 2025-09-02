@@ -40,10 +40,10 @@
   <script>
     // == Настройка: поместите сюда ваш Markdown в переменную MARKDOWN ==
     let MARKDOWN = ``;
-    const lesson_id = {{lesson_id}};
+    const lecture_id = {{lecture_id}};
 
     let get_text = async () => {
-      let res = await fetch(`/lesson/${lesson_id}/data`)
+      let res = await fetch(`/lecture/${lecture_id}/data`)
       const data = await res.json();
 
       MARKDOWN = data['summarized_text'];
