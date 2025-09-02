@@ -1,5 +1,7 @@
 import sys
 
+from aiogram.client.default import DefaultBotProperties
+
 sys.path.append('.')
 sys.path.append('service_bot')
 
@@ -14,7 +16,7 @@ import handlers
 import middlewares
 
 dp = Dispatcher()
-bot = Bot(config.bot_token)
+bot = Bot(config.bot_token, default=DefaultBotProperties(parse_mode='html'))
 
 
 async def start_polling():

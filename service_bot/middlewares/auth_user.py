@@ -1,7 +1,7 @@
 from typing import Any, Dict, Callable
 
 from aiogram import BaseMiddleware, types
-from aiogram.types import Update
+from aiogram.types import Update, LinkPreviewOptions
 from sqlalchemy import select, insert, update
 
 import db
@@ -24,22 +24,22 @@ class AuthUserMiddleware(BaseMiddleware):
         )).fetchone()
 
         if db_user is None:
-            await data['dbconn'].execute(
+            db_user = (await data['dbconn'].execute(
                 insert(db.User).values(
                     id=user.id,
                     first_name=user.first_name,
                     last_name=user.last_name,
                     username=user.username,
                 )
-            )
+                .returning(db.User)
+            )).fetchone()
 
         elif (db_user[0].first_name != user.first_name
                 or db_user[0].last_name != user.last_name
                 or db_user[0].username != user.username):
 
             db_user = (await data['dbconn'].execute(
-                update(db.User)
-                .where(db.User.id == user.id)
+                update(db.User).where(db.User.id == user.id)
                 .values(
                     id=user.id,
                     first_name=user.first_name,
@@ -54,6 +54,7 @@ class AuthUserMiddleware(BaseMiddleware):
                 user.id,
                 'You are not whitelisted in this bot. '
                 'Request access from the bot administrator or <a href="https://github.com/teleportx/LobzikAI">host your own bot</a>.',
+                link_preview_options=LinkPreviewOptions(is_disabled=True)
             )
             return None
 
