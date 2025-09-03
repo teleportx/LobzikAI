@@ -40,7 +40,8 @@
   <script>
     // == Настройка: поместите сюда ваш Markdown в переменную MARKDOWN ==
     let MARKDOWN = ``;
-    const lecture_id = {{lecture_id}};
+    const lecture_id = '{{lecture_id}}';
+    console.log(lecture_id);
 
     let get_text = async () => {
       let res = await fetch(`/lecture/${lecture_id}/data`)
