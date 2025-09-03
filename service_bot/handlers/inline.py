@@ -3,6 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import db
+import keyboards.inline
 
 router = Router()
 
@@ -26,7 +27,8 @@ async def handle_inline(query: types.InlineQuery, dbconn: AsyncSession):
             input_message_content=types.InputTextMessageContent(
                 message_text=f'Lecture note <b>{lec.title}</b>\n'
                              f'<i>~ {formatted_datetime}</i>'
-            )
+            ),
+            reply_markup=keyboards.inline.get(lec.id)
         ))
 
     await query.answer(results, cache_time=0, is_personal=True)

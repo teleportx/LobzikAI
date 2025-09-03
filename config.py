@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 debug = environ['DEBUG'] == 'TRUE'
+host = environ['HOST']
 
 db_url = environ['DB_URL']
 amqp_url = environ['AMQP_URL']
