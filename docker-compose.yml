@@ -1,0 +1,18 @@
+services:
+  nginx:
+    image: nginx:latest
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
+  service-bot:
+    build:
+      context: ./
+      dockerfile: service_bot/Dockerfile
+    restart: unless-stopped
+
+  service-web:
+    build:
+      context: ./
+      dockerfile: service_web/Dockerfile
+    restart: unless-stopped
