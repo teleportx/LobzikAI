@@ -12,7 +12,7 @@ class LectureProcessor(BaseProcessor):
         self.summarizer = AsyncTextSummarizer()
         self.asr = AsyncAudioTranscriber()
 
-    async def __call__(self, audio_base64: str, language: str = "ru") -> SummarizerResponseModel:
+    async def __call__(self, audio_base64: str, language: str = "ru") -> tuple[str, SummarizerResponseModel]:
         extracted_text = await self.asr(audio_base64=audio_base64, language=language)
         summarized_text = await self.summarizer(text=extracted_text)
-        return summarized_text
+        return extracted_text, summarized_text

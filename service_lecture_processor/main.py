@@ -19,20 +19,22 @@ from processor import LectureProcessor
 
 setup_logger.__init__('Service Lecture Processor')
 
-
 lecture_processor = LectureProcessor()
 
 
 async def on_message(message: DeliveredMessage):
     body = json.loads(message.body.decode())
 
-    result = await lecture_processor(audio_base64=body["file"])
+    raw_text, result = await lecture_processor(audio_base64=body["file"])
 
     async with db.base.Session() as dbconn:
         await dbconn.execute(
             insert(db.Lecture).values(
+                owner_id=body['owner_id'],
                 title = result.title,
-                raw_text=result.text,
+                raw_text=raw_text,
+                summarized_text=result.text,
+                created_at=body['created_at'],
             )
         )
 
