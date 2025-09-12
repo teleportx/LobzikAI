@@ -19,6 +19,7 @@ class AsyncTextSummarizer(BaseProcessor):
             model=self.model,
             temperature=0,
             api_key=self.api_key,
+            base_url='https://openrouter.ai/api/v1/'
         ).with_structured_output(SummarizerResponseModel)
 
         self.prompt = ChatPromptTemplate.from_messages([

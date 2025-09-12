@@ -8,7 +8,7 @@ class AsyncAudioTranscriber(BaseProcessor):
     def __init__(self):
         super().__init__()
         self.model = os.environ.get("ASR_MODEL", "whisper-large-v3")
-        self.url = "https://api.openrouter.ai/v1/audio/transcriptions"
+        self.url = "https://openrouter.ai/api/v1/audio/transcriptions"
         self.session = aiohttp.ClientSession()
 
     def __del__(self):
