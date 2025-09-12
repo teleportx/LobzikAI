@@ -1,8 +1,8 @@
-from base import BaseProcessor
-from summarizer import AsyncTextSummarizer
-from asr import AsyncAudioTranscriber
+from .base import BaseProcessor
+from .summarizer import AsyncTextSummarizer
+from .asr import AsyncAudioTranscriber
 
-from service_lecture_processor.schemas import SummarizerResponseModel
+from schemas import SummarizerResponseModel
 
 
 class LectureProcessor(BaseProcessor):

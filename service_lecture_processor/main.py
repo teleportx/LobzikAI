@@ -27,8 +27,8 @@ async def on_message(message: DeliveredMessage):
 
     raw_text, result = await lecture_processor(audio_base64=body["file"])
 
-    async with db.base.Session() as dbconn:
-        await dbconn.execute(
+    async with db.base.Session() as session:
+        await session.execute(
             insert(db.Lecture).values(
                 owner_id=body['owner_id'],
                 title = result.title,
@@ -37,6 +37,7 @@ async def on_message(message: DeliveredMessage):
                 created_at=body['created_at'],
             )
         )
+        await session.commit()
 
     await message.channel.basic_ack(message.delivery_tag)  # set message is proceed
 

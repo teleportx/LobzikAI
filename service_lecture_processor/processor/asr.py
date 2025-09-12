@@ -1,7 +1,7 @@
 import aiohttp
 import os
 
-from base import BaseProcessor
+from .base import BaseProcessor
 
 
 class AsyncAudioTranscriber(BaseProcessor):

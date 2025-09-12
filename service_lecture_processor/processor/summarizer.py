@@ -2,8 +2,8 @@ import os
 from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 
-from base import BaseProcessor
-from service_lecture_processor.schemas import SummarizerResponseModel
+from .base import BaseProcessor
+from schemas import SummarizerResponseModel
 
 
 class AsyncTextSummarizer(BaseProcessor):
