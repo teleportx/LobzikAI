@@ -5,7 +5,7 @@ from .base import BaseProcessor
 
 
 class AsyncAudioTranscriber(BaseProcessor):
-    def __init__(self, chunk_size_mb: int = 10):
+    def __init__(self, chunk_size_mb: int = 4):
         super().__init__()
         self.model = os.environ.get("ASR_MODEL", "whisper-large-v3")
         self.url = "https://openrouter.ai/api/v1/audio/transcriptions"

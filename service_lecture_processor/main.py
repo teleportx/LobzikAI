@@ -11,6 +11,7 @@ import io
 from aiogram import Bot
 from sqlalchemy import insert
 from aiormq.abc import DeliveredMessage
+from loguru import logger
 
 import brocker
 import setup_logger
@@ -32,6 +33,7 @@ async def on_message(message: DeliveredMessage):
     file = io.BytesIO()
     await bot.download(body['file_id'], file)
     encoded_file = base64.b64encode(file.read()).decode()
+    logger.debug(f'File {body['file_id']} downloaded')
 
     raw_text, result = await lecture_processor(audio_base64=encoded_file)
 
