@@ -16,3 +16,9 @@ services:
       context: ./
       dockerfile: service_web/Dockerfile
     restart: unless-stopped
+
+  service-lecture-processor:
+    build:
+      context: ./
+      dockerfile: service_lecture_processor/Dockerfile
+    restart: unless-stopped
