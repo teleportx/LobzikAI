@@ -22,7 +22,7 @@ from processor import LectureProcessor
 
 setup_logger.__init__('Service Lecture Processor')
 
-lecture_processor = LectureProcessor()
+lecture_processor: LectureProcessor
 bot = Bot(config.bot_token)
 
 
@@ -51,7 +51,10 @@ async def on_message(message: DeliveredMessage):
 
 
 async def main():
+    global lecture_processor
+
     db.base.start()
+    lecture_processor = LectureProcessor()
 
     channel = await (await brocker.get_connection()).channel()
     await channel.basic_qos(prefetch_count=3)
