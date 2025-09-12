@@ -1,18 +1,21 @@
 import sys
 
-from sqlalchemy import insert
-
 sys.path.append('.')
 sys.path.append('service_lecture_processor')
 
 import asyncio
 import json
+import base64
+import io
 
+from aiogram import Bot
+from sqlalchemy import insert
 from aiormq.abc import DeliveredMessage
 
 import brocker
 import setup_logger
 import db
+import config
 
 from processor import LectureProcessor
 
@@ -20,12 +23,17 @@ from processor import LectureProcessor
 setup_logger.__init__('Service Lecture Processor')
 
 lecture_processor = LectureProcessor()
+bot = Bot(config.bot_token)
 
 
 async def on_message(message: DeliveredMessage):
     body = json.loads(message.body.decode())
 
-    raw_text, result = await lecture_processor(audio_base64=body["file"])
+    file = io.BytesIO()
+    await bot.download(body['file_id'], file)
+    encoded_file = base64.b64encode(file.read()).decode()
+
+    raw_text, result = await lecture_processor(audio_base64=encoded_file)
 
     async with db.base.Session() as session:
         await session.execute(
