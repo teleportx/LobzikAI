@@ -44,3 +44,13 @@ services:
     env_file:
       - integrated.env
     restart: unless-stopped
+
+  service-asr:
+    build:
+      context: ./
+      dockerfile: service_asr/Dockerfile
+    env_file:
+      - integrated.env
+    restart: unless-stopped
+    volumes:
+      - ./data/ai_models:./service_asr/cache

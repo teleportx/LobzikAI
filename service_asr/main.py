@@ -16,11 +16,15 @@ import setup_logger
 import config
 
 from utils.get_bot_api_session import get_bot_api_session
+from config import num_asr_workers
+
+from .multi_thread_asr import MultiThreadSpeechToText
 
 
 setup_logger.__init__('Service ASR')
 
 bot = Bot(config.bot_token, session=get_bot_api_session())
+model = MultiThreadSpeechToText(workers=num_asr_workers)
 
 
 async def on_message(message: DeliveredMessage):
@@ -33,9 +37,9 @@ async def on_message(message: DeliveredMessage):
     await bot.download(body['file_id'], file)
     encoded_file = base64.b64encode(file.read()).decode()
 
-    # TODO: call ASR model
+    result = model(audio_base64=encoded_file)
 
-    body['asr_result'] = '<pass here>'
+    body['asr_result'] = result
     callback_body = json.dumps(body, separators=(',', ':')).encode()
     await message.channel.basic_publish(callback_body, routing_key=callback_topic)
 

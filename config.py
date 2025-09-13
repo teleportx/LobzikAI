@@ -13,6 +13,7 @@ openrouter_key = environ['OPENROUTER_KEY']
 bot_token = environ['BOT_TOKEN']
 
 db_pool_max_size = 5
+num_asr_workers = 12
 
 model_cache_dir = environ.get("MODEL_CACHE_DIR", "./cache")
 asr_model = environ.get("ASR_MODEL", "google/gemini-2.5-flash")

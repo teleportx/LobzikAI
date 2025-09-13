@@ -76,7 +76,7 @@ class AsyncTextSummarizer(BaseProcessor):
             "max_tokens": len(lecture_text) // 4,
         }
 
-    async def __call__(self, session: ClientSession, text: str) -> SummarizerResponseModel:
+    async def __call__(self, session: ClientSession, text: str) -> tuple[str, SummarizerResponseModel]:
         """Summarize the given text asynchronously"""
         json_body = self._format_request_body(lecture_text=text)
 
@@ -85,4 +85,4 @@ class AsyncTextSummarizer(BaseProcessor):
             data = await response.json()
             message = json.loads(data["choices"][0]["message"]["content"])
 
-        return SummarizerResponseModel(**message)
+        return text, SummarizerResponseModel(**message)

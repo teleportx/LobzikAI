@@ -16,5 +16,5 @@ class LectureProcessor(BaseProcessor):
 
     async def __call__(self, session: ClientSession, audio_base64: str) -> tuple[str, SummarizerResponseModel]:
         extracted_text = await self.asr(audio_base64=audio_base64, session=session)
-        summarized_text = await self.summarizer(text=extracted_text, session=session)
-        return extracted_text, summarized_text
+        summarize_result = await self.summarizer(text=extracted_text, session=session)
+        return summarize_result

@@ -19,12 +19,12 @@ import setup_logger
 import db
 import config
 
-from processor import LectureProcessor
+from processor.summarizer import AsyncTextSummarizer
 
 
 setup_logger.__init__('Service Lecture Processor')
 
-lecture_processor: LectureProcessor
+lecture_processor: AsyncTextSummarizer
 
 bot = Bot(config.bot_token, session=get_bot_api_session())
 
@@ -32,10 +32,8 @@ bot = Bot(config.bot_token, session=get_bot_api_session())
 async def on_message(message: DeliveredMessage):
     body = json.loads(message.body.decode())
 
-    # TODO: get raw_text from body['asr_result'] and process
-
     async with ClientSession() as session:
-        raw_text, result = await lecture_processor(audio_base64=encoded_file, session=session)
+        raw_text, result = await lecture_processor(text=body["asr_result"], session=session)
 
     async with db.base.Session() as session:
         await session.execute(
@@ -56,7 +54,7 @@ async def main():
     global lecture_processor
 
     db.base.start()
-    lecture_processor = LectureProcessor()
+    lecture_processor = AsyncTextSummarizer()
 
     channel = await (await brocker.get_connection()).channel()
     await channel.basic_qos(prefetch_count=3)
