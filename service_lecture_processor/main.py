@@ -1,21 +1,18 @@
 import sys
 
+from utils.get_bot_api_session import get_bot_api_session
+
 sys.path.append('.')
 sys.path.append('service_lecture_processor')
 
 import asyncio
 import json
-import base64
 from datetime import datetime
-import io
 
 from aiohttp import ClientSession
 from aiogram import Bot
-from aiogram.client.session.aiohttp import AiohttpSession
-from aiogram.client.telegram import TelegramAPIServer
 from sqlalchemy import insert
 from aiormq.abc import DeliveredMessage
-from loguru import logger
 
 import brocker
 import setup_logger
@@ -29,26 +26,13 @@ setup_logger.__init__('Service Lecture Processor')
 
 lecture_processor: LectureProcessor
 
-session = None
-if config.telegram_bot_api_server is not None:
-    logger.info(f'Use telegram API server {config.telegram_bot_api_server}')
-    session = AiohttpSession(
-        api=TelegramAPIServer(
-            base=f'{config.telegram_bot_api_server}/bot{{token}}/{{method}}',
-            file=f'{config.telegram_bot_api_server}/file{{path}}',
-        )
-    )
-
-bot = Bot(config.bot_token, session=session)
+bot = Bot(config.bot_token, session=get_bot_api_session())
 
 
 async def on_message(message: DeliveredMessage):
     body = json.loads(message.body.decode())
 
-    file = io.BytesIO()
-    await bot.download(body['file_id'], file)
-    encoded_file = base64.b64encode(file.read()).decode()
-    logger.debug(f'File {body['file_id']} downloaded')
+    # TODO: get raw_text from body['asr_result'] and process
 
     async with ClientSession() as session:
         raw_text, result = await lecture_processor(audio_base64=encoded_file, session=session)
@@ -77,7 +61,7 @@ async def main():
     channel = await (await brocker.get_connection()).channel()
     await channel.basic_qos(prefetch_count=3)
 
-    declare = await channel.queue_declare('lecture_to_process', durable=True)
+    declare = await channel.queue_declare('lecture_process', durable=True)
     await channel.basic_consume(
         declare.queue, on_message
     )

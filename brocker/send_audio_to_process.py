@@ -11,10 +11,11 @@ async def send_audio_to_process(owner_id: int, file_id: str):
         'owner_id': owner_id,
         'file_id': file_id,
         'created_at': str(datetime.now().astimezone()),
+        'callback_topic': 'lecture_process',
 
     }, separators=(',', ':')).encode()
 
     await channel.basic_publish(
         body,
-        routing_key='lecture_to_process'
+        routing_key='asr'
     )
