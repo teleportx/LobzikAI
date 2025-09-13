@@ -1,15 +1,15 @@
 import sys
 
-from aiogram.client.session.aiohttp import AiohttpSession
-from aiogram.client.telegram import TelegramAPIServer
-
 sys.path.append('.')
 sys.path.append('service_bot')
 
 import asyncio
+from loguru import logger
 
 from aiogram import Dispatcher, Bot
 from aiogram.client.default import DefaultBotProperties
+from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.client.telegram import TelegramAPIServer
 
 import db
 import config
@@ -25,6 +25,7 @@ dp = Dispatcher()
 
 session = None
 if config.telegram_bot_api_server is not None:
+    logger.info(f'Use telegram API server {config.telegram_bot_api_server}')
     session = AiohttpSession(
         api=TelegramAPIServer.from_base(config.telegram_bot_api_server)
     )

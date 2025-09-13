@@ -31,6 +31,7 @@ lecture_processor: LectureProcessor
 
 session = None
 if config.telegram_bot_api_server is not None:
+    logger.info(f'Use telegram API server {config.telegram_bot_api_server}')
     session = AiohttpSession(
         api=TelegramAPIServer.from_base(config.telegram_bot_api_server)
     )
