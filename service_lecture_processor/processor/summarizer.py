@@ -13,9 +13,10 @@ class AsyncTextSummarizer(BaseProcessor):
         super().__init__()
         self.system_prompt = """You are an assistant who makes a brief of some lecture.
         You need to extract all facts from lecture. Your result - a list of facts.
-        Put 1 blank line between facts.
         Input data is noisy, so pay attention only at facts 
         (not dialogues, appeals or some phrases not related to lecture)
+        All output data must be in markdown format. Sort all facts by their topic. 
+        Before every group of facts with the same topic, put a header.
         """
 
         self.model = sum_model

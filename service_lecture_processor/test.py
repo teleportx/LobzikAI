@@ -67,8 +67,8 @@ sample_text="""
    а при этом в правах был таким же, как крестьянин. Вот его обязывали по документам жить в той деревне, где он родился. Ну и так далее.
 """
 start = time.time()
-print(asyncio.run(call_summarizer(audio_file_path)))
-# print(asyncio.run(call_sum_sep(text=sample_text)))
+# print(asyncio.run(call_summarizer(audio_file_path)))
+print(asyncio.run(call_sum_sep(text=sample_text)))
 end = time.time()
 
 print(f"Execution time {end - start}")
