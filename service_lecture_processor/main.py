@@ -1,5 +1,4 @@
 import sys
-from datetime import datetime
 
 sys.path.append('.')
 sys.path.append('service_lecture_processor')
@@ -7,10 +6,13 @@ sys.path.append('service_lecture_processor')
 import asyncio
 import json
 import base64
+from datetime import datetime
 import io
 
 from aiohttp import ClientSession
 from aiogram import Bot
+from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.client.telegram import TelegramAPIServer
 from sqlalchemy import insert
 from aiormq.abc import DeliveredMessage
 from loguru import logger
@@ -26,7 +28,14 @@ from processor import LectureProcessor
 setup_logger.__init__('Service Lecture Processor')
 
 lecture_processor: LectureProcessor
-bot = Bot(config.bot_token)
+
+session = None
+if config.telegram_bot_api_server is not None:
+    session = AiohttpSession(
+        api=TelegramAPIServer.from_base(config.telegram_bot_api_server)
+    )
+
+bot = Bot(config.bot_token, session=session)
 
 
 async def on_message(message: DeliveredMessage):
