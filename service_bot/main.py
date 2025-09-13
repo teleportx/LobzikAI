@@ -1,5 +1,8 @@
 import sys
 
+from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.client.telegram import TelegramAPIServer
+
 sys.path.append('.')
 sys.path.append('service_bot')
 
@@ -19,7 +22,14 @@ import setup_logger
 setup_logger.__init__('Service bot')
 
 dp = Dispatcher()
-bot = Bot(config.bot_token, default=DefaultBotProperties(parse_mode='html'))
+
+session = None
+if config.telegram_bot_api_server is not None:
+    session = AiohttpSession(
+        api=TelegramAPIServer.from_base(config.telegram_bot_api_server)
+    )
+
+bot = Bot(config.bot_token, default=DefaultBotProperties(parse_mode='html'), session=session)
 
 
 async def start_polling():
