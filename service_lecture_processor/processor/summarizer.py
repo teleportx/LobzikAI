@@ -1,10 +1,11 @@
-import os
 import json
 
 from aiohttp import ClientSession
 
 from .base import BaseProcessor
+
 from schemas import SummarizerResponseModel
+from config import sum_model
 
 
 class AsyncTextSummarizer(BaseProcessor):
@@ -12,11 +13,12 @@ class AsyncTextSummarizer(BaseProcessor):
         super().__init__()
         self.system_prompt = """You are an assistant who makes a brief of some lecture.
         You need to extract all facts from lecture. Your result - a list of facts.
+        Put 1 blank line between facts.
         Input data is noisy, so pay attention only at facts 
         (not dialogues, appeals or some phrases not related to lecture)
         """
 
-        self.model = os.environ.get("SUMMARIZATION_MODEL", "gpt-4o-mini")
+        self.model = sum_model
 
     @staticmethod
     def _format_response_format():

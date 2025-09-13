@@ -1,13 +1,14 @@
-import os
 from aiohttp import ClientSession
 
 from .base import BaseProcessor
+
+from config import asr_model
 
 
 class AsyncAudioTranscriber(BaseProcessor):
     def __init__(self, chunk_size_mb: int = 4):
         super().__init__()
-        self.model = os.environ.get("ASR_MODEL", "google/gemini-2.5-flash")
+        self.model = asr_model
         self.chunk_size = chunk_size_mb * 1024 * 1024
 
         self.system_prompt = """Transcribe user's audio"""

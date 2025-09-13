@@ -13,3 +13,7 @@ openrouter_key = environ['OPENROUTER_KEY']
 bot_token = environ['BOT_TOKEN']
 
 db_pool_max_size = 5
+
+asr_model = environ.get("ASR_MODEL", "google/gemini-2.5-flash")
+sum_model = environ.get("SUMMARIZATION_MODEL", "gpt-4o-mini")
+mm_model = environ.get("MM_MODEL", "google/gemini-2.5-flash")

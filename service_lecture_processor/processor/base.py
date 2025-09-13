@@ -1,12 +1,11 @@
-import os
 from abc import ABC, abstractmethod
 
-import config
+from config import openrouter_key
 
 
 class BaseProcessor(ABC):
     def __init__(self):
-        self.api_key = config.openrouter_key
+        self.api_key = openrouter_key
         self.url = "https://openrouter.ai/api/v1/chat/completions"
 
         self.headers = {
