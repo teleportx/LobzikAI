@@ -1,4 +1,5 @@
 import sys
+from datetime import datetime
 
 sys.path.append('.')
 sys.path.append('service_lecture_processor')
@@ -46,7 +47,7 @@ async def on_message(message: DeliveredMessage):
                 title=result.title,
                 raw_text=raw_text,
                 summarized_text=result.text,
-                created_at=body['created_at'],
+                created_at=datetime.fromisoformat(body['created_at']),
             )
         )
         await session.commit()
