@@ -24,6 +24,7 @@ services:
       - integrated.env
     depends_on:
       - telegram-bot-api
+      - nginx
 
   service-web:
     build:
