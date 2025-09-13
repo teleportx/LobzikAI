@@ -35,7 +35,7 @@ if config.telegram_bot_api_server is not None:
     session = AiohttpSession(
         api=TelegramAPIServer(
             base=f'{config.telegram_bot_api_server}/bot{{token}}/{{method}}',
-            file=f'{config.telegram_bot_api_server}/file/bot{{token}}{{path}}',
+            file=f'{config.telegram_bot_api_server}/file{{path}}',
         )
     )
 
