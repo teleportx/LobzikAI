@@ -2,23 +2,45 @@ services:
   nginx:
     image: nginx:latest
     restart: unless-stopped
+    ports:
+      - "19022:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../data/telegram-bot-api-data:/var/lib/telegram-bot-api:ro
+
+  telegram-bot-api:
+    image: aiogram/telegram-bot-api:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - TELEGRAM_LOCAL=TRUE
+    volumes:
+      - ../data/telegram-bot-api-data:/var/lib/telegram-bot-api
 
   service-bot:
     build:
       context: ./
       dockerfile: service_bot/Dockerfile
     restart: unless-stopped
+    env_file:
+      - integrated.env
+    depends_on:
+      - telegram-bot-api
+      - nginx
 
   service-web:
     build:
       context: ./
       dockerfile: service_web/Dockerfile
+    env_file:
+      - integrated.env
     restart: unless-stopped
 
   service-lecture-processor:
     build:
       context: ./
       dockerfile: service_lecture_processor/Dockerfile
+    env_file:
+      - integrated.env
     restart: unless-stopped
