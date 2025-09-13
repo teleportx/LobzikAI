@@ -7,6 +7,7 @@ services:
 
   telegram-bot-api:
     image: aiogram/telegram-bot-api:latest
+    restart: unless-stopped
     env_file:
       - .env
     volumes:
