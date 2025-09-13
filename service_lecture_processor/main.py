@@ -8,6 +8,7 @@ import json
 import base64
 import io
 
+from aiohttp import ClientSession
 from aiogram import Bot
 from sqlalchemy import insert
 from aiormq.abc import DeliveredMessage
@@ -35,7 +36,8 @@ async def on_message(message: DeliveredMessage):
     encoded_file = base64.b64encode(file.read()).decode()
     logger.debug(f'File {body['file_id']} downloaded')
 
-    raw_text, result = await lecture_processor(audio_base64=encoded_file)
+    async with ClientSession as async_session:
+        raw_text, result = await lecture_processor(audio_base64=encoded_file, session=async_session)
 
     async with db.base.Session() as session:
         await session.execute(
