@@ -16,7 +16,7 @@ db_pool_max_size = 5
 
 model_cache_dir = environ.get("MODEL_CACHE_DIR", "./cache")
 asr_model = environ.get("ASR_MODEL", "google/gemini-2.5-flash")
-sum_model = environ.get("SUMMARIZATION_MODEL", "gpt-4o-mini")
+sum_model = environ.get("SUMMARIZATION_MODEL", "openai/gpt-5-mini")
 mm_model = environ.get("MM_MODEL", "google/gemini-2.5-flash")
 local_asr_vosk_model = environ.get("LOCAL_ASR_VOSK_MODEL", "vosk-model-ru-0.22")
 
