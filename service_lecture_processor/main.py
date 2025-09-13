@@ -36,14 +36,14 @@ async def on_message(message: DeliveredMessage):
     encoded_file = base64.b64encode(file.read()).decode()
     logger.debug(f'File {body['file_id']} downloaded')
 
-    async with ClientSession as async_session:
-        raw_text, result = await lecture_processor(audio_base64=encoded_file, session=async_session)
+    async with ClientSession() as session:
+        raw_text, result = await lecture_processor(audio_base64=encoded_file, session=session)
 
     async with db.base.Session() as session:
         await session.execute(
             insert(db.Lecture).values(
                 owner_id=body['owner_id'],
-                title = result.title,
+                title=result.title,
                 raw_text=raw_text,
                 summarized_text=result.text,
                 created_at=body['created_at'],
