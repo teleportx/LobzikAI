@@ -10,7 +10,7 @@ services:
     env_file:
       - .env
     volumes:
-      - telegram-bot-api-data:/var/lib/telegram-bot-api
+      - ../data/telegram-bot-api-data:/var/lib/telegram-bot-api
 
   service-bot:
     build:
