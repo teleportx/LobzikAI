@@ -33,7 +33,10 @@ session = None
 if config.telegram_bot_api_server is not None:
     logger.info(f'Use telegram API server {config.telegram_bot_api_server}')
     session = AiohttpSession(
-        api=TelegramAPIServer.from_base(config.telegram_bot_api_server)
+        api=TelegramAPIServer(
+            base=f'{config.telegram_bot_api_server}/bot{{token}}/{{method}}',
+            file=f'{config.telegram_bot_api_server}/file/bot{{token}}{{path}}',
+        )
     )
 
 bot = Bot(config.bot_token, session=session)
