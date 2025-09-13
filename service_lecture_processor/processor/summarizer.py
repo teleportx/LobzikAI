@@ -13,7 +13,8 @@ class AsyncTextSummarizer(BaseProcessor):
         super().__init__()
         self.system_prompt = """You are an assistant who makes a brief of some lecture.
         You need to extract all facts from lecture. Your result - a list of facts.
-        Input data is noisy, so pay attention only at facts 
+        Input data is noisy, so pay attention only at facts, but save a whole sense of lecture.
+        Don't lose any details about facts.
         (not dialogues, appeals or some phrases not related to lecture)
         All output data must be in markdown format. Sort all facts by their topic. 
         Before every group of facts with the same topic, put a header.
@@ -72,6 +73,7 @@ class AsyncTextSummarizer(BaseProcessor):
             "model": self.model,
             "messages": messages,
             "response_format": self._format_response_format(),
+            "max_tokens": len(lecture_text) // 4,
         }
 
     async def __call__(self, session: ClientSession, text: str) -> SummarizerResponseModel:
