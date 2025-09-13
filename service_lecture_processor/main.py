@@ -43,7 +43,9 @@ async def on_message(message: DeliveredMessage):
     body = json.loads(message.body.decode())
 
     file = io.BytesIO()
-    await bot.download(body['file_id'], file)
+    file_info = await bot.get_file(body['file_id'])
+    print(file_info.file_path)
+    return
     encoded_file = base64.b64encode(file.read()).decode()
     logger.debug(f'File {body['file_id']} downloaded')
 
