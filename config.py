@@ -18,7 +18,7 @@ model_cache_dir = environ.get("MODEL_CACHE_DIR", "./cache")
 
 class Constants:
     db_pool_max_size = 5
-    num_asr_workers = 8
+    num_asr_workers = int(environ['NUM_ASR_WORKERS'])
 
 
 class AIModels:
