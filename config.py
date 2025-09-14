@@ -15,6 +15,7 @@ bot_token = environ['BOT_TOKEN']
 telegram_bot_api_server = environ.get('TELEGRAM_BOT_API_SERVER')
 model_cache_dir = environ.get("MODEL_CACHE_DIR", "./cache")
 
+
 class Constants:
     db_pool_max_size = 5
     num_asr_workers = 12
