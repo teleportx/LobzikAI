@@ -9,18 +9,18 @@ from vosk import Model, KaldiRecognizer
 
 from utils import download_and_extract_zip, convert_audio_to_vosk_wav
 
-from config import model_cache_dir, local_asr_vosk_model
+import config
 
 
 class MultiThreadSpeechToText:
     def __init__(self, workers: int = 12):
-        self.model_name = local_asr_vosk_model
-        self.saving_path = os.path.join(model_cache_dir, self.model_name)
+        self.model_name = config.AIModels.local_asr_vosk_model
+        self.saving_path = os.path.join(config.model_cache_dir, self.model_name)
 
         if not os.path.exists(self.saving_path):
             download_and_extract_zip(
                 url=f"https://alphacephei.com/vosk/models/{self.model_name}.zip",
-                save_dir=model_cache_dir,
+                save_dir=config.model_cache_dir,
             )
 
         self.model = Model(model_path=self.saving_path)

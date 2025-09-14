@@ -16,7 +16,6 @@ import setup_logger
 import config
 
 from utils.get_bot_api_session import get_bot_api_session
-from config import num_asr_workers
 
 from .multi_thread_asr import MultiThreadSpeechToText
 
@@ -24,7 +23,7 @@ from .multi_thread_asr import MultiThreadSpeechToText
 setup_logger.__init__('Service ASR')
 
 bot = Bot(config.bot_token, session=get_bot_api_session())
-model = MultiThreadSpeechToText(workers=num_asr_workers)
+model = MultiThreadSpeechToText(workers=config.Constants.num_asr_workers)
 
 
 async def on_message(message: DeliveredMessage):

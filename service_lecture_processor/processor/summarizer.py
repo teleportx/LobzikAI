@@ -5,7 +5,7 @@ from aiohttp import ClientSession
 from .base import BaseProcessor
 
 from schemas import SummarizerResponseModel
-from config import sum_model
+import config
 
 
 class AsyncTextSummarizer(BaseProcessor):
@@ -20,7 +20,7 @@ class AsyncTextSummarizer(BaseProcessor):
         Before every group of facts with the same topic, put a header.
         """
 
-        self.model = sum_model
+        self.model = config.AIModels.sum_model
 
     @staticmethod
     def _format_response_format():

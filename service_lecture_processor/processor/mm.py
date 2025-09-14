@@ -5,7 +5,7 @@ from aiohttp import ClientSession
 from .base import BaseProcessor
 
 from schemas import SummarizerResponseModel
-from config import mm_model
+import config
 
 
 class MultiModalProcessor(BaseProcessor):
@@ -19,7 +19,7 @@ class MultiModalProcessor(BaseProcessor):
         (not dialogues, appeals or some phrases not related to lecture)
         """
 
-        self.model = mm_model
+        self.model = config.AIModels.mm_model
 
     def _format_request_body(self, audio_base64: str) -> dict:
         messages = [

@@ -17,6 +17,6 @@ def start():
     engine = create_async_engine(
         config.db_url.replace('postgresql', 'postgresql+asyncpg'),
         echo=config.debug,
-        pool_size=config.db_pool_max_size
+        pool_size=config.Constants.db_pool_max_size
     )
     Session = async_sessionmaker(bind=engine)
