@@ -3,7 +3,6 @@ import io
 import os
 import wave
 import json
-from typing import Optional
 import concurrent.futures
 from vosk import Model, KaldiRecognizer
 
@@ -27,25 +26,32 @@ class MultiThreadSpeechToText:
         self.model = Model(model_path=self.saving_path)
         self.workers = workers
         self.chunk_overlapping = chunk_overlapping
-        self.rec: Optional[KaldiRecognizer] = None
 
     def _process_chunk(self, wav_bytes: bytes, start_frame: int, end_frame: int, framerate: int) -> str:
         with wave.open(io.BytesIO(wav_bytes), 'rb') as wf:
             wf.setpos(start_frame)
+            rec = KaldiRecognizer(self.model, framerate)
+
+            channels = wf.getnchannels()
+            sampwidth = wf.getsampwidth()
+            frame_bytes = channels * sampwidth
 
             result_text = ""
             frames_to_read = end_frame - start_frame
+
             while frames_to_read > 0:
-                data = wf.readframes(min(4000, frames_to_read))
+                frames_chunk = min(4000, frames_to_read)
+                data = wf.readframes(frames_chunk)
                 if not data:
                     break
-                frames_to_read -= len(data) // wf.getsampwidth()
 
-                if self.rec.AcceptWaveform(data):
-                    result = json.loads(self.rec.Result())
+                frames_to_read -= len(data) // frame_bytes
+
+                if rec.AcceptWaveform(data):
+                    result = json.loads(rec.Result())
                     result_text += result.get("text", "") + " "
 
-            final_result = json.loads(self.rec.FinalResult())
+            final_result = json.loads(rec.FinalResult())
             result_text += final_result.get("text", "")
         return result_text.strip()
 
@@ -60,7 +66,6 @@ class MultiThreadSpeechToText:
             total_frames = wf.getnframes()
             chunk_size = total_frames // self.workers
             overlap_frames = int(self.chunk_overlapping * framerate)
-            self.rec = KaldiRecognizer(self.model, framerate)
 
             chunks = []
             for i in range(self.workers):

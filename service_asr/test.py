@@ -9,7 +9,7 @@ def encode_audio_to_base64():
 
 audio_path = "Обществознание.mp3"
 
-model = MultiThreadSpeechToText()
+model = MultiThreadSpeechToText(workers=8, chunk_overlapping=2.0)
 encoded_audio = encode_audio_to_base64()
 result = model(audio_base64=encoded_audio)
 print(result)
