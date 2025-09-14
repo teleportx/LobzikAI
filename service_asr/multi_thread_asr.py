@@ -7,7 +7,8 @@ import time
 import concurrent.futures
 from vosk import Model, KaldiRecognizer
 
-from utils import download_and_extract_zip, convert_audio_to_vosk_wav
+from utils.download_and_extract_zip import download_and_extract_zip
+from utils.convert_audio_to_vosk_wav import convert_audio_to_vosk_wav
 
 import config
 

@@ -17,7 +17,7 @@ import config
 
 from utils.get_bot_api_session import get_bot_api_session
 
-from .multi_thread_asr import MultiThreadSpeechToText
+from multi_thread_asr import MultiThreadSpeechToText
 
 
 setup_logger.__init__('Service ASR')
