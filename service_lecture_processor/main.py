@@ -1,5 +1,6 @@
 import sys
 
+from loguru import logger
 
 sys.path.append('.')
 sys.path.append('service_lecture_processor')
@@ -60,6 +61,7 @@ async def main():
     await channel.basic_qos(prefetch_count=3)
 
     declare = await channel.queue_declare('lecture_process', durable=True)
+    logger.info('Start listen queue')
     await channel.basic_consume(
         declare.queue, on_message
     )

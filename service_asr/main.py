@@ -57,6 +57,7 @@ async def main():
     await channel.basic_qos(prefetch_count=1)
 
     declare = await channel.queue_declare('asr', durable=True)
+    logger.info('Start listen queue')
     await channel.basic_consume(
         declare.queue, on_message
     )
