@@ -40,7 +40,6 @@ async def on_message(message: DeliveredMessage):
     encoded_file = base64.b64encode(file.read()).decode()
 
     result = model(audio_base64=encoded_file)
-    print(result)
 
     body['asr_result'] = result
     callback_body = json.dumps(body, separators=(',', ':')).encode()
