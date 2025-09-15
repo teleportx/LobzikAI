@@ -1,5 +1,7 @@
 import sys
 
+from loguru import logger
+
 sys.path.append('.')
 sys.path.append('service_asr')
 
@@ -31,6 +33,7 @@ model = MultiThreadSpeechToText(
 
 async def on_message(message: DeliveredMessage):
     body = json.loads(message.body.decode())
+    logger.info(f'Start ASR for {body['file_id']}')
 
     callback_topic = body['callback_topic']
     body.pop('callback_topic')
