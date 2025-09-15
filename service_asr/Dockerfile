@@ -4,7 +4,7 @@ WORKDIR /app
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
-        build-essential
+        build-essential ffmpeg
 
 COPY ./requirements.txt requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
