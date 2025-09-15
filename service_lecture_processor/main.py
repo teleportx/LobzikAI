@@ -12,6 +12,7 @@ from aiohttp import ClientSession
 from aiogram import Bot
 from sqlalchemy import insert
 from aiormq.abc import DeliveredMessage
+from aiogram.client.default import DefaultBotProperties
 
 import brocker
 import setup_logger
@@ -27,7 +28,7 @@ setup_logger.__init__('Service Lecture Processor')
 
 lecture_processor: AsyncTextSummarizer
 
-bot = Bot(config.bot_token, session=get_bot_api_session())
+bot = Bot(config.bot_token, default=DefaultBotProperties(parse_mode='html'), session=get_bot_api_session())
 
 
 async def on_message(message: DeliveredMessage):
