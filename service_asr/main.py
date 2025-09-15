@@ -49,9 +49,9 @@ async def on_message(message: DeliveredMessage):
     callback_body = json.dumps(body, separators=(',', ':')).encode()
     logger.info('ST')
 
-    await message.channel.basic_publish(callback_body, routing_key=callback_topic)
+    channel = await brocker.base.storer.get_channel()
+    await channel.basic_publish(callback_body, routing_key=callback_topic)
     logger.info('OK')
-
 
     await message.channel.basic_ack(message.delivery_tag)  # set message is proceed
 
