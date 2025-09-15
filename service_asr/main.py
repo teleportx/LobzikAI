@@ -43,13 +43,15 @@ async def on_message(message: DeliveredMessage):
     encoded_file = base64.b64encode(file.read()).decode()
 
     result = model(audio_base64=encoded_file)
-    print('OR')
+    logger.info('OR')
 
     body['asr_result'] = result
     callback_body = json.dumps(body, separators=(',', ':')).encode()
-    print('ST')
+    logger.info('ST')
+
     await message.channel.basic_publish(callback_body, routing_key=callback_topic)
-    print('OK')
+    logger.info('OK')
+
 
     await message.channel.basic_ack(message.delivery_tag)  # set message is proceed
 
