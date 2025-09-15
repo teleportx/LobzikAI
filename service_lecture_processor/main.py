@@ -1,5 +1,6 @@
 import sys
 
+import keyboards
 
 sys.path.append('.')
 sys.path.append('service_lecture_processor')
@@ -37,7 +38,7 @@ async def on_message(message: DeliveredMessage):
         raw_text, result = await lecture_processor(text=body["asr_result"], session=session)
 
     async with db.base.Session() as session:
-        await session.execute(
+        lecture_id = (await session.execute(
             insert(db.Lecture).values(
                 owner_id=body['owner_id'],
                 title=result.title,
@@ -45,8 +46,17 @@ async def on_message(message: DeliveredMessage):
                 summarized_text=result.text,
                 created_at=datetime.fromisoformat(body['created_at']),
             )
-        )
+            .returning(db.Lecture.id)
+        )).fetchone().id
         await session.commit()
+
+    formatted_datetime = datetime.fromisoformat(body['created_at']).strftime('%d %b %Y %H:%M')
+    await bot.send_message(
+        body['owner_id'],
+        f'Your lecture <b>{result.title}</b> is ready!\n'
+        f'<i>~ {formatted_datetime}</i>',
+        reply_markup=keyboards.inline.get(lecture_id),
+    )
 
     await message.channel.basic_ack(message.delivery_tag)  # set message is proceed
 
