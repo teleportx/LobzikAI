@@ -1,3 +1,8 @@
+import sys
+
+sys.path.append('.')
+sys.path.append('service_asr')
+
 from multi_thread_asr import MultiThreadSpeechToText
 import base64
 
