@@ -6,12 +6,12 @@ RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         build-essential
 
-COPY ../requirements.txt requirements.txt
+COPY ./requirements.txt requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-COPY ./requirements.txt service_requirements.txt
+COPY ./service_asr/requirements.txt service_requirements.txt
 RUN pip3 install --no-cache-dir -r service_requirements.txt
 
-COPY .. .
+COPY . .
 
 CMD ["python", "service_asr/main.py"]
