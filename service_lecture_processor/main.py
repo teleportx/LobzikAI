@@ -1,7 +1,5 @@
 import sys
 
-import keyboards
-
 sys.path.append('.')
 sys.path.append('service_lecture_processor')
 
@@ -19,6 +17,7 @@ import brocker
 import setup_logger
 import db
 import config
+import keyboards
 from utils.get_bot_api_session import get_bot_api_session
 
 from processor.summarizer import AsyncTextSummarizer
