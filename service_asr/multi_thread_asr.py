@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import io
 import os
@@ -55,7 +56,7 @@ class MultiThreadSpeechToText:
             result_text += final_result.get("text", "")
         return result_text.strip()
 
-    def __call__(self, audio_base64: str) -> str:
+    async def __call__(self, audio_base64: str) -> str:
         """Get text from audiofile, split into N chunks and process in parallel."""
         audio_file = base64.b64decode(audio_base64)
 
@@ -79,9 +80,13 @@ class MultiThreadSpeechToText:
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.workers) as executor:
             futures = [
-                executor.submit(self._process_chunk, wav_bytes, start, end, framerate)
+                asyncio.get_event_loop().run_in_executor(
+                    executor,
+                    self._process_chunk,
+                    wav_bytes, start, end, framerate
+                )
                 for start, end in chunks
             ]
-            results = [f.result() for f in futures]
+            results = await asyncio.gather(*futures)
 
         return " ".join(results).strip()

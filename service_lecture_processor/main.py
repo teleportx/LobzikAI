@@ -1,6 +1,5 @@
 import sys
 
-from loguru import logger
 
 sys.path.append('.')
 sys.path.append('service_lecture_processor')
@@ -8,6 +7,7 @@ sys.path.append('service_lecture_processor')
 import asyncio
 import json
 from datetime import datetime
+from loguru import logger
 
 from aiohttp import ClientSession
 from aiogram import Bot

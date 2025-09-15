@@ -1,7 +1,5 @@
 import sys
 
-from loguru import logger
-
 sys.path.append('.')
 sys.path.append('service_asr')
 
@@ -9,6 +7,7 @@ import asyncio
 import json
 import base64
 import io
+from loguru import logger
 
 from aiogram import Bot
 from aiormq.abc import DeliveredMessage
@@ -42,16 +41,13 @@ async def on_message(message: DeliveredMessage):
     await bot.download(body['file_id'], file)
     encoded_file = base64.b64encode(file.read()).decode()
 
-    result = model(audio_base64=encoded_file)
-    logger.info('OR')
+    result = await model(audio_base64=encoded_file)
 
     body['asr_result'] = result
     callback_body = json.dumps(body, separators=(',', ':')).encode()
-    logger.info('ST')
 
     channel = await brocker.base.storer.get_channel()
     await channel.basic_publish(callback_body, routing_key=callback_topic)
-    logger.info('OK')
 
     await message.channel.basic_ack(message.delivery_tag)  # set message is proceed
 
