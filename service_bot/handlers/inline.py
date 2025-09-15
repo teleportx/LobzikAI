@@ -19,7 +19,7 @@ async def handle_inline(query: types.InlineQuery, dbconn: AsyncSession):
     results = []
     for lec in lectures:
         formatted_datetime = lec.created_at.strftime('%d %b %Y %H:%M')
-        formatted_date = lec.created_at.strftime('%d.%m')
+        formatted_date = lec.created_at.strftime('%d.%m %H:%M')
 
         results.append(types.InlineQueryResultArticle(
             id=str(lec.id),
