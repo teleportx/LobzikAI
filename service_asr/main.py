@@ -25,7 +25,7 @@ setup_logger.__init__('Service ASR')
 bot = Bot(config.bot_token, session=get_bot_api_session())
 model = MultiThreadSpeechToText(
     workers=config.Constants.num_asr_workers,
-    chunk_overlapping=config.
+    chunk_overlapping=config.Constants.chunk_overlapping
 )
 
 
