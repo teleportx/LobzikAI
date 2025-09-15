@@ -53,4 +53,4 @@ services:
       - integrated.env
     restart: unless-stopped
     volumes:
-      - ./data/service_asr/cache:/app/service_asr/cache
+      - ../data/service_asr/cache:/app/service_asr/cache
