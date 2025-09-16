@@ -4,20 +4,16 @@ from aiohttp import ClientSession
 
 from .base import BaseProcessor
 
-from service_lecture_processor.schemas import SummarizerResponseModel
+from service_lecture_processor.schemas import TestMakerResponseModel
 import config
 
 
-class AsyncTextSummarizer(BaseProcessor):
+class AsyncTestMaker(BaseProcessor):
     def __init__(self):
         super().__init__()
-        self.system_prompt = """You are an assistant who makes a brief of some lecture.
-        You need to extract all facts from lecture. Your result - a list of facts.
-        Input data is noisy, so pay attention only at facts, but save a whole sense of lecture.
-        Don't lose any details about facts.
-        (not dialogues, appeals or some phrases not related to lecture)
-        All output data must be in markdown format. Sort all facts by their topic. 
-        Before every group of facts with the same topic, put a header.
+        self.system_prompt = """You are teacher. You've been provided some facts from lecture.
+        Your task - Make a short test with growing complexity of questions. 
+        Your response 10 questions with respective answers.
         """
 
         self.model = config.AIModels.sum_model
@@ -27,22 +23,32 @@ class AsyncTextSummarizer(BaseProcessor):
         return {
             "type": "json_schema",
             "json_schema": {
-                "name": "lecture_summary",
+                "name": "test_maker_response",
                 "strict": True,
                 "schema": {
                     "type": "object",
                     "properties": {
-                        "text": {
-                            "type": "string",
-                            "description": "Brief of lecture (list of facts)"
-                        },
-                        "title": {
-                            "type": "string",
-                            "description": "Topic of lecture (max length - 30 chars)",
-                            "maxLength": 40
+                        "test_samples": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "question": {
+                                        "type": "string",
+                                        "description": "A test question"
+                                    },
+                                    "answer": {
+                                        "type": "string",
+                                        "description": "The correct answer to the question"
+                                    }
+                                },
+                                "required": ["question", "answer"],
+                                "additionalProperties": False,
+                            },
+                            "description": "A list of test questions containing questions and answers"
                         }
                     },
-                    "required": ["text", "title"],
+                    "required": ["test_samples"],
                     "additionalProperties": False
                 }
             }
@@ -64,7 +70,7 @@ class AsyncTextSummarizer(BaseProcessor):
                 "content": [
                     {
                         "type": "text",
-                        "text": f"Summarize this lecture: {lecture_text}"
+                        "text": f"Lecture: {lecture_text}"
                     }
                 ]
             }
@@ -73,10 +79,10 @@ class AsyncTextSummarizer(BaseProcessor):
             "model": self.model,
             "messages": messages,
             "response_format": self._format_response_format(),
-            "max_tokens": len(lecture_text) // 4,
+            "max_tokens": len(lecture_text) // 8,
         }
 
-    async def __call__(self, session: ClientSession, text: str) -> SummarizerResponseModel:
+    async def __call__(self, session: ClientSession, text: str) -> TestMakerResponseModel:
         """Summarize the given text asynchronously"""
         json_body = self._format_request_body(lecture_text=text)
 
@@ -85,7 +91,6 @@ class AsyncTextSummarizer(BaseProcessor):
             data = await response.json()
             message = json.loads(data["choices"][0]["message"]["content"])
 
-        return SummarizerResponseModel(
-            ai_response=message,
-            raw_text=text,
+        return TestMakerResponseModel(
+            test_samples=message
         )

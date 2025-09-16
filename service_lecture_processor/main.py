@@ -21,12 +21,12 @@ import config
 import keyboards
 from utils.get_bot_api_session import get_bot_api_session
 
-from processor.summarizer import AsyncTextSummarizer
+from processor import LectureProcessor
 
 
 setup_logger.__init__('Service Lecture Processor')
 
-lecture_processor: AsyncTextSummarizer
+lecture_processor: LectureProcessor
 
 bot = Bot(config.bot_token, default=DefaultBotProperties(parse_mode='html'), session=get_bot_api_session())
 
@@ -35,15 +35,15 @@ async def on_message(message: DeliveredMessage):
     body = json.loads(message.body.decode())
 
     async with ClientSession() as session:
-        raw_text, result = await lecture_processor(text=body["asr_result"], session=session)
+        result = await lecture_processor(extracted_text=body["asr_result"], session=session)
 
     async with db.base.Session() as session:
         lecture_id = (await session.execute(
             insert(db.Lecture).values(
                 owner_id=body['owner_id'],
-                title=result.title,
-                raw_text=raw_text,
-                summarized_text=result.text,
+                title=result.summarizer_response.ai_response.title,
+                raw_text=result.summarizer_response.raw_text,
+                summarized_text=result.summarizer_response.ai_response.text,
                 created_at=datetime.fromisoformat(body['created_at']),
             )
             .returning(db.Lecture.id)
@@ -65,7 +65,7 @@ async def main():
     global lecture_processor
 
     db.base.start()
-    lecture_processor = AsyncTextSummarizer()
+    lecture_processor = LectureProcessor()
 
     channel = await (await brocker.get_connection()).channel()
     await channel.basic_qos(prefetch_count=3)
