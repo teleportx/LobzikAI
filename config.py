@@ -27,4 +27,4 @@ class AIModels:
     sum_model = environ.get("SUMMARIZATION_MODEL", "openai/gpt-5-mini")
     mm_model = environ.get("MM_MODEL", "google/gemini-2.5-flash")
     local_asr_vosk_model = environ.get("LOCAL_ASR_VOSK_MODEL", "vosk-model-ru-0.22")
-    test_maker_model = environ.get("TEST_MAKER_MODEL", "openai/gpt-4o-mini")
+    base_gpt_model = environ.get("BASE_GPT_MODEL", "openai/gpt-4o-mini")

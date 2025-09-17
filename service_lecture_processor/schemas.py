@@ -3,9 +3,12 @@ from typing import List
 from pydantic import BaseModel, Field
 
 
-class SummarizerAIModel(BaseModel):
-    text: str = Field(description="Brief of lecture")
-    title: str = Field(description="Topic of lecture (max length - 30 chars)", max_length=40)
+class TextModel(BaseModel):
+    text: str
+
+
+class SummarizerAIModel(TextModel):
+    title: str
 
 
 class SummarizerResponseModel(BaseModel):
@@ -19,7 +22,7 @@ class TestSampleModel(BaseModel):
 
 
 class TestMakerResponseModel(BaseModel):
-    test_samples: List[TestSampleModel]
+    test_samples: List[TestSampleModel] = Field(default=[])
 
 
 class ProcessorResponseModel(BaseModel):

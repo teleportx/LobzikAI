@@ -4,7 +4,7 @@ from aiohttp import ClientSession
 
 from .base import BaseProcessor
 
-from service_lecture_processor.schemas import TestMakerResponseModel
+from schemas import TestMakerResponseModel
 import config
 
 
@@ -16,7 +16,7 @@ class AsyncTestMaker(BaseProcessor):
         Your response 10 questions with respective answers.
         """
 
-        self.model = config.AIModels.sum_model
+        self.model = config.AIModels.base_gpt_model
 
     @staticmethod
     def _format_response_format():
@@ -79,11 +79,10 @@ class AsyncTestMaker(BaseProcessor):
             "model": self.model,
             "messages": messages,
             "response_format": self._format_response_format(),
-            "max_tokens": len(lecture_text) // 8,
         }
 
     async def __call__(self, session: ClientSession, text: str) -> TestMakerResponseModel:
-        """Summarize the given text asynchronously"""
+        """Make test about lecture asynchronously"""
         json_body = self._format_request_body(lecture_text=text)
 
         async with session.post(self.url, headers=self.headers, json=json_body) as response:

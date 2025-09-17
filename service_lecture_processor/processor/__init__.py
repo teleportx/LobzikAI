@@ -16,9 +16,18 @@ class LectureProcessor(BaseProcessor):
         self.asr = AsyncAudioTranscriber()
         self.test_maker = AsyncTestMaker()
 
-    async def __call__(self, session: ClientSession, extracted_text: str) -> ProcessorResponseModel:
+    async def __call__(
+            self,
+            session: ClientSession,
+            extracted_text: str,
+            make_test: bool = False,
+    ) -> ProcessorResponseModel:
+
         summarize_result = await self.summarizer(text=extracted_text, session=session)
-        test_maker_result = await self.test_maker(text=summarize_result.ai_response.text, session=session)
+
+        test_maker_result = []
+        if make_test:
+            test_maker_result = await self.test_maker(text=summarize_result.ai_response.text, session=session)
 
         return ProcessorResponseModel(
             summarizer_response=summarize_result,
