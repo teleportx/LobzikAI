@@ -4,7 +4,7 @@ from aiohttp import ClientSession
 
 from .base import BaseProcessor
 
-from schemas import SummarizerResponseModel
+from .schemas import SummarizerResponseModel
 import config
 
 

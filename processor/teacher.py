@@ -1,8 +1,8 @@
 from aiohttp import ClientSession
 
-from .base import BaseProcessor
+from processor.base import BaseProcessor
 
-from schemas import TextModel
+from .schemas import TextModel
 import config
 
 

@@ -4,8 +4,9 @@ from .base import BaseProcessor
 from .summarizer import AsyncTextSummarizer
 from .asr import AsyncAudioTranscriber
 from .test_maker import AsyncTestMaker
+from .teacher import AsyncTeacherModel
 
-from service_lecture_processor.schemas import ProcessorResponseModel
+from .schemas import ProcessorResponseModel
 
 
 class LectureProcessor(BaseProcessor):
