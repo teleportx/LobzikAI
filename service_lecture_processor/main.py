@@ -52,6 +52,16 @@ async def on_message(message: DeliveredMessage):
             )
             .returning(db.Lecture.id)
         )).fetchone().id
+
+        for question in result.test_maker_response.test_samples:
+            await session.execute(
+                insert(db.LectureTestQuestion).values(
+                    lecture_id=lecture_id,
+                    text=question.question,
+                    answer=question.answer,
+                )
+            )
+
         await session.commit()
 
     print("ZOV")
