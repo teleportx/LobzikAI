@@ -54,6 +54,8 @@ async def on_message(message: DeliveredMessage):
         )).fetchone().id
         await session.commit()
 
+    print("ZOV")
+
     formatted_datetime = datetime.fromisoformat(body['created_at']).strftime('%d %b %Y %H:%M')
     await bot.send_message(
         body['owner_id'],
