@@ -35,7 +35,11 @@ async def on_message(message: DeliveredMessage):
     body = json.loads(message.body.decode())
 
     async with ClientSession() as session:
-        result = await lecture_processor(extracted_text=body["asr_result"], session=session)
+        result = await lecture_processor(
+            extracted_text=body["asr_result"],
+            session=session,
+            make_test=False
+        )
 
     async with db.base.Session() as session:
         lecture_id = (await session.execute(
