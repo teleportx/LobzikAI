@@ -9,14 +9,37 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
   <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/highlight.min.js"></script>
   <style>
-    :root{--bg:#0b0e14;--panel:#111520;--text:#e6e6e6;--muted:#9aa4b2;--brand:#7aa2f7;--border:#23283a;--code-bg:#0d1117;--radius:14px;--font-ui:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-    *{box-sizing:border-box}html,body{height:100%}body{margin:0;background:radial-gradient(800px 600px at 10% -10%, rgba(122,162,247,.09), transparent),var(--bg);color:var(--text);font-family:var(--font-ui);line-height:1.6;padding:28px}
-    .card{max-width:1100px;margin:0 auto;background:linear-gradient(180deg, rgba(255,255,255,.02), transparent);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;padding:22px}
-    .meta{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-    .logo{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--brand),#8bd5ca)}
-    h1{font-size:20px;margin:0}
-    .muted{color:var(--muted);font-size:13px}
-
+    :root{
+      --bg:#0b0e14;
+      --panel:#111520;
+      --text:#e6e6e6;
+      --muted:#9aa4b2;
+      --brand:#7aa2f7;
+      --border:#23283a;
+      --code-bg:#0d1117;
+      --radius:14px;
+      --font-ui:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background: radial-gradient(800px 600px at 10% -10%, rgba(122,162,247,.09), transparent) no-repeat fixed,
+                  var(--bg);
+      color:var(--text);
+      font-family:var(--font-ui);
+      line-height:1.6;
+      padding:28px
+    }
+    .card{
+      max-width:1100px;
+      margin:0 auto;
+      background:linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      overflow:hidden;
+      padding:22px
+    }
     .preview{padding:8px 2px 18px 2px}
     .preview h1{font-size:2rem;margin-top:1rem}
     .preview h2{font-size:1.5rem}
@@ -29,51 +52,200 @@
     .preview th,.preview td{border:1px solid var(--border);padding:.5em .6em}
     .preview img{max-width:100%;border-radius:8px;border:1px solid var(--border)}
 
-    @media (max-width:720px){body{padding:14px}.card{padding:14px} .preview h1{font-size:1.4rem}}
+    /* Панель управления */
+    #editor-controls {
+      display: none;
+      gap: .6rem;
+      margin-bottom: 1rem;
+    }
+    #editor-controls button {
+      padding: .45em 1em;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background .2s ease, opacity .2s ease;
+    }
+    #editBtn, #saveBtn {
+      background: var(--brand);
+      color: #fff;
+    }
+    #editBtn.cancel {
+      background: #555; /* серый при редактировании */
+    }
+    #editor-controls button:hover { opacity:.85; }
+
+    /* Редактор */
+    .editor-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0;
+      margin-bottom: 1rem;
+    }
+    .editor-box textarea {
+      width: 100%;
+      min-height: calc(100vh - 240px);
+      border: none;
+      outline: none;
+      resize: vertical;
+      background: transparent;
+      color: var(--text);
+      font-family: ui-monospace, Menlo, Monaco, Consolas, monospace;
+      font-size: 15px;
+      line-height: 1.5;
+      padding: 12px;
+    }
+
+    /* quiz */
+    #quiz {margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border)}
+    .blur {filter: blur(5px); cursor:pointer}
+    .blur.revealed {filter:none}
+
+    /* ask AI */
+    #ask-ai {margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border)}
+    #ask-ai textarea{width:100%;padding:.6em;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--text);margin-bottom:.6em}
+    #ask-ai button{padding:.5em 1em;border:none;border-radius:8px;background:var(--brand);color:#fff;cursor:pointer}
+    #ask-ai button:hover{opacity:.9}
+
+    @media (max-width:720px){
+      body{padding:14px}
+      .card{padding:14px}
+      .preview h1{font-size:1.4rem}
+      .editor-box textarea{min-height:50vh}
+    }
   </style>
 </head>
 <body>
   <div class="card" role="main">
+    <div id="editor-controls">
+      <button id="editBtn">✏️ Редактировать</button>
+      <button id="saveBtn" style="display:none;">💾 Сохранить</button>
+    </div>
+
     <article id="preview" class="preview" aria-live="polite"></article>
+
+    <!-- Мини-тест -->
+    <section id="quiz">
+      <h2>Проверь себя</h2>
+      <div class="qa">
+        <p><b>Вопрос:</b> Что такое замыкание в JS?</p>
+        <p><b>Ответ:</b> <span class="blur">Замыкание — это функция, которая запоминает своё лексическое окружение даже после выхода из него.</span></p>
+      </div>
+    </section>
+
+    <!-- Вопрос к AI -->
+    <section id="ask-ai">
+      <h2>Задай вопрос AI</h2>
+      <textarea id="ai-question" rows="3" placeholder="Напиши свой вопрос..."></textarea>
+      <button id="askBtn">🤖 Спросить</button>
+      <div id="ai-answer" class="muted"></div>
+    </section>
   </div>
 
   <script>
-    // == Настройка: поместите сюда ваш Markdown в переменную MARKDOWN ==
     let MARKDOWN = ``;
     const lecture_id = '{{lecture_id}}';
-    console.log(lecture_id);
+    const apikey = 'gh';
+    const preview = document.getElementById('preview');
+    const editBtn = document.getElementById('editBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const controls = document.getElementById('editor-controls');
 
-    let get_text = async () => {
-      let res = await fetch(`/lecture/${lecture_id}/data`)
+    async function get_text() {
+      let res = await fetch(`/lecture/${lecture_id}/data`);
       const data = await res.json();
-
       MARKDOWN = data['summarized_text'];
-      console.log(MARKDOWN);
     }
 
-    // Marked + DOMPurify + highlight.js
-    marked.setOptions({ gfm: true, breaks: true, headerIds: true, mangle: false, smartLists: true, highlight: (code, lang) => {
-      try { if(lang && hljs.getLanguage(lang)) return hljs.highlight(code, {language:lang}).value } catch(_) {}
-      try { return hljs.highlightAuto(code).value } catch(_) { return code }
-    }});
-
-    const preview = document.getElementById('preview');
+    marked.setOptions({
+      gfm: true, breaks: true, headerIds: true, mangle: false, smartLists: true,
+      highlight: (code, lang) => {
+        try { if(lang && hljs.getLanguage(lang)) return hljs.highlight(code, {language:lang}).value } catch(_) {}
+        try { return hljs.highlightAuto(code).value } catch(_) { return code }
+      }
+    });
 
     function render(md){
       const html = marked.parse(md);
       const clean = DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
       preview.innerHTML = clean;
-      // ссылки в новом окне
       preview.querySelectorAll('a[href]').forEach(a => { a.target = '_blank'; a.rel = 'noopener noreferrer nofollow' });
-      // подсветка
       preview.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
     }
 
-    // Рендерим MARKDOWN сразу
     get_text().then(() => render(MARKDOWN));
 
+    if (apikey) controls.style.display = 'flex';
 
-    // Экспорт: удобно менять MARKDOWN извне (например, из devtools)
+    let editing = false;
+    let editorBox, textarea;
+
+    editBtn.onclick = () => {
+      if (!editing) {
+        // Включаем режим редактирования
+        editorBox = document.createElement('div');
+        editorBox.className = 'editor-box';
+        textarea = document.createElement('textarea');
+        textarea.value = MARKDOWN;
+        editorBox.appendChild(textarea);
+
+        preview.replaceWith(editorBox);
+
+        editBtn.textContent = "✖ Отмена";
+        editBtn.classList.add("cancel"); // серый
+        saveBtn.style.display = "inline-block";
+
+        textarea.focus();
+        editing = true;
+      } else {
+        // Отмена
+        editorBox.replaceWith(preview);
+        editBtn.textContent = "✏️ Редактировать";
+        editBtn.classList.remove("cancel");
+        saveBtn.style.display = "none";
+        editing = false;
+      }
+    };
+
+    saveBtn.onclick = async () => {
+      if (editing) {
+        const newMd = textarea.value;
+        let res = await fetch(`/lecture/${lecture_id}/update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apikey}` },
+          body: JSON.stringify({ text: newMd })
+        });
+        if (res.ok) {
+          MARKDOWN = newMd;
+          render(MARKDOWN);
+          editorBox.replaceWith(preview);
+          editBtn.textContent = "✏️ Редактировать";
+          editBtn.classList.remove("cancel");
+          saveBtn.style.display = "none";
+          editing = false;
+        }
+      }
+    };
+
+    document.addEventListener('click', e => {
+      if (e.target.classList.contains('blur')) {
+        e.target.classList.toggle('revealed');
+      }
+    });
+
+    document.getElementById('askBtn').onclick = async () => {
+      const q = document.getElementById('ai-question').value;
+      document.getElementById('ai-answer').textContent = "⏳ Думаю...";
+      const res = await fetch(`/lecture/${lecture_id}/ask`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q })
+      });
+      const data = await res.json();
+      document.getElementById('ai-answer').textContent = data.answer;
+    };
+
     window.setMarkdown = (md) => { render(md); };
     window.getHtml = () => preview.innerHTML;
   </script>
