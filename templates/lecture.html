@@ -146,7 +146,7 @@
   <script>
     let MARKDOWN = ``;
     const lecture_id = '{{lecture_id}}';
-    const apikey = 'gh';
+    const apikey = 'test';
     const preview = document.getElementById('preview');
     const editBtn = document.getElementById('editBtn');
     const saveBtn = document.getElementById('saveBtn');
@@ -211,10 +211,10 @@
     saveBtn.onclick = async () => {
       if (editing) {
         const newMd = textarea.value;
-        let res = await fetch(`/lecture/${lecture_id}/update`, {
-          method: 'POST',
+        let res = await fetch(`/lecture/${lecture_id}/edit`, {
+          method: 'PATCH',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apikey}` },
-          body: JSON.stringify({ text: newMd })
+          body: JSON.stringify({ summarized_text: newMd })
         });
         if (res.ok) {
           MARKDOWN = newMd;
