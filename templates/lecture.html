@@ -104,9 +104,35 @@
 
     /* ask AI */
     #ask-ai {margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border)}
-    #ask-ai textarea{width:100%;padding:.6em;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--text);margin-bottom:.6em}
-    #ask-ai button{padding:.5em 1em;border:none;border-radius:8px;background:var(--brand);color:#fff;cursor:pointer}
+    #ask-ai div.ai-row {display:flex; gap:.5rem; align-items:flex-start; margin-bottom:.5rem;}
+    #ask-ai textarea{
+      flex:1;
+      padding:.6em;
+      border-radius:8px;
+      border:1px solid var(--border);
+      background:var(--panel);
+      color:var(--text);
+      resize:vertical;
+    }
+    #ask-ai button{
+      padding:.5em 1em;
+      border:none;
+      border-radius:8px;
+      background:var(--brand);
+      color:#fff;
+      cursor:pointer;
+      transition:opacity .2s ease;
+    }
     #ask-ai button:hover{opacity:.9}
+    #ai-answer{
+      margin-top:.6rem;
+      padding:.8em;
+      border-radius:8px;
+      background:rgba(122,162,247,.05);
+      max-height:200px;
+      overflow:auto;
+      white-space:pre-wrap;
+    }
 
     @media (max-width:720px){
       body{padding:14px}
@@ -137,8 +163,10 @@
     <!-- Вопрос к AI -->
     <section id="ask-ai">
       <h2>Задай вопрос AI</h2>
-      <textarea id="ai-question" rows="3" placeholder="Напиши свой вопрос..."></textarea>
-      <button id="askBtn">🤖 Спросить</button>
+      <div class="ai-row">
+        <textarea id="ai-question" rows="3" placeholder="Напиши свой вопрос..."></textarea>
+        <button id="askBtn">🤖 Спросить</button>
+      </div>
       <div id="ai-answer" class="muted"></div>
     </section>
   </div>
@@ -146,7 +174,7 @@
   <script>
     let MARKDOWN = ``;
     const lecture_id = '{{lecture_id}}';
-    const apikey = 'test';
+    const apikey = window.apikey || 'test';
     const preview = document.getElementById('preview');
     const editBtn = document.getElementById('editBtn');
     const saveBtn = document.getElementById('saveBtn');
@@ -183,23 +211,20 @@
 
     editBtn.onclick = () => {
       if (!editing) {
-        // Включаем режим редактирования
         editorBox = document.createElement('div');
         editorBox.className = 'editor-box';
         textarea = document.createElement('textarea');
         textarea.value = MARKDOWN;
         editorBox.appendChild(textarea);
-
         preview.replaceWith(editorBox);
 
         editBtn.textContent = "✖ Отмена";
-        editBtn.classList.add("cancel"); // серый
+        editBtn.classList.add("cancel");
         saveBtn.style.display = "inline-block";
 
         textarea.focus();
         editing = true;
       } else {
-        // Отмена
         editorBox.replaceWith(preview);
         editBtn.textContent = "✏️ Редактировать";
         editBtn.classList.remove("cancel");
@@ -234,16 +259,35 @@
       }
     });
 
-    document.getElementById('askBtn').onclick = async () => {
-      const q = document.getElementById('ai-question').value;
-      document.getElementById('ai-answer').textContent = "⏳ Думаю...";
-      const res = await fetch(`/lecture/${lecture_id}/ask`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: q })
-      });
-      const data = await res.json();
-      document.getElementById('ai-answer').textContent = data.answer;
+    // Ask AI с ограничением 3 сек
+    let lastAskTime = 0;
+    const askBtn = document.getElementById('askBtn');
+    const aiAnswer = document.getElementById('ai-answer');
+    askBtn.onclick = async () => {
+      const now = Date.now();
+      if (now - lastAskTime < 3000) { alert('Подожди пару секунд перед новым запросом...'); return; }
+      lastAskTime = now;
+
+      const q = document.getElementById('ai-question').value.trim();
+      if (!q) return;
+
+      askBtn.disabled = true;
+      askBtn.style.opacity = '0.6';
+      aiAnswer.textContent = "⏳ Думаю...";
+
+      try {
+        const res = await fetch(`/lecture/${lecture_id}/ask`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: q })
+        });
+        const data = await res.json();
+        aiAnswer.textContent = data['answer'] || "❌ Нет ответа";
+      } catch(e) {
+        aiAnswer.textContent = "❌ Ошибка запроса";
+      }
+
+      setTimeout(() => { askBtn.disabled = false; askBtn.style.opacity = '1'; }, 3000);
     };
 
     window.setMarkdown = (md) => { render(md); };

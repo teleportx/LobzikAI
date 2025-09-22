@@ -1,12 +1,15 @@
 import uuid
 
+import aiohttp
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import select, update
 from starlette.requests import Request
 from starlette.templating import Jinja2Templates
+from watchfiles import awatch
 
 import db
+from processor import AsyncTeacherModel
 
 router = APIRouter(prefix='/lecture')
 templates = Jinja2Templates('templates')
@@ -14,6 +17,19 @@ templates = Jinja2Templates('templates')
 
 class LectureEditModel(BaseModel):
     summarized_text: str = Field(max_length=10 ** 6)
+
+
+class LectureAskModel(BaseModel):
+    question: str = Field(max_length=10 ** 3)
+
+
+teacher_model = AsyncTeacherModel()
+
+
+async def call_teacher_model(summarized_text: str, question: str):
+    async with aiohttp.ClientSession() as session:
+        answer = await teacher_model(session, summarized_text, question)
+    return answer
 
 
 @router.get('/{lecture_id}')
@@ -50,3 +66,18 @@ async def handle_lecture_data(request: Request, lecture_id: uuid.UUID, body: Lec
 
     if lecture is None:
         raise HTTPException(404, 'Lecture not found')
+
+
+@router.post('/{lecture_id}/ask')
+async def handle_lecture_data(request: Request, lecture_id: uuid.UUID, body: LectureAskModel):
+    lecture = (await request.state.db.execute(
+        select(db.Lecture.summarized_text)
+        .where(db.Lecture.id == lecture_id)
+    )).fetchone()
+
+    if lecture is None:
+        raise HTTPException(404, 'Lecture not found')
+
+    return {
+        'answer': (await call_teacher_model(lecture.summarized_text, body.question)).text
+    }
