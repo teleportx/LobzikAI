@@ -71,7 +71,7 @@ async def on_message(message: DeliveredMessage):
         body['owner_id'],
         f'Your lecture <b>{result.title}</b> is ready!\n'
         f'<i>~ {formatted_datetime}</i>',
-        reply_markup=keyboards.inline.get(lecture_id),
+        reply_markup=keyboards.lecture.get_owned(lecture_id, body['owner_id']),
     )
 
     await message.channel.basic_ack(message.delivery_tag)  # set message is proceed

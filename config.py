@@ -22,6 +22,8 @@ class Constants:
     num_asr_workers = int(environ.get('NUM_ASR_WORKERS', 8))
     chunk_overlapping = float(environ.get("CHUNK_OVERLAPPING", 2.0))
 
+    lecture_token_ttl = 365 * 24 * 60 * 60
+
 
 class AIModels:
     asr_model = environ.get("ASR_MODEL", "google/gemini-2.5-flash")

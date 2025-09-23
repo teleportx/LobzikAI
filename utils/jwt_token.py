@@ -78,7 +78,7 @@ class AuthRawDepend:
         assert len(token_parts) >= 2
 
         token_type = token_parts[0]
-        token = ' '.join(token_type[1:])
+        token = ' '.join(token_parts[1:])
 
         assert token_type == 'Bearer'
 

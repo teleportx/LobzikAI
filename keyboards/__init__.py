@@ -1,1 +1,1 @@
-from . import inline
+from . import lecture
