@@ -1,205 +1,328 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Markdown Preview — Dark Theme</title>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/highlight.min.js"></script>
-  <style>
-    :root{
-      --bg:#0b0e14;
-      --panel:#111520;
-      --text:#e6e6e6;
-      --muted:#9aa4b2;
-      --brand:#7aa2f7;
-      --border:#23283a;
-      --code-bg:#0d1117;
-      --radius:14px;
-      --font-ui:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      background: radial-gradient(800px 600px at 10% -10%, rgba(122,162,247,.09), transparent) no-repeat fixed,
-                  var(--bg);
-      color:var(--text);
-      font-family:var(--font-ui);
-      line-height:1.6;
-      padding:28px
-    }
-    .card{
-      max-width:1100px;
-      margin:0 auto;
-      background:linear-gradient(180deg, rgba(255,255,255,.02), transparent);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      overflow:hidden;
-      padding:22px
-    }
-    .preview{padding:8px 2px 18px 2px}
-    .preview h1{font-size:2rem;margin-top:1rem}
-    .preview h2{font-size:1.5rem}
-    .preview p{margin:.6em 0}
-    .preview a{color:var(--brand)}
-    .preview blockquote{border-left:3px solid var(--brand);padding:.5em 1em;background:rgba(122,162,247,.03);border-radius:8px}
-    .preview code{font-family:ui-monospace,Menlo,Monaco,Consolas,monospace;padding:.12em .35em;border-radius:6px;background:rgba(255,255,255,.04)}
-    .preview pre{background:var(--code-bg);padding:12px;border-radius:10px;border:1px solid var(--border);overflow:auto}
-    .preview table{width:100%;border-collapse:collapse;margin:1em 0}
-    .preview th,.preview td{border:1px solid var(--border);padding:.5em .6em}
-    .preview img{max-width:100%;border-radius:8px;border:1px solid var(--border)}
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Markdown Preview — Dark Theme</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/highlight.min.js"></script>
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --panel: #111520;
+            --text: #e6e6e6;
+            --muted: #9aa4b2;
+            --brand: #7aa2f7;
+            --border: #23283a;
+            --code-bg: #0d1117;
+            --radius: 14px;
+            --font-ui: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial
+        }
 
-    /* Панель управления */
-    #editor-controls {
-      display: none;
-      gap: .6rem;
-      margin-bottom: 1rem;
-    }
-    #editor-controls button {
-      padding: .45em 1em;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background .2s ease, opacity .2s ease;
-    }
-    #editBtn, #saveBtn {
-      background: var(--brand);
-      color: #fff;
-    }
-    #editBtn.cancel {
-      background: #555; /* серый при редактировании */
-    }
-    #editor-controls button:hover { opacity:.85; }
+        * {
+            box-sizing: border-box
+        }
 
-    /* Редактор */
-    .editor-box {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 0;
-      margin-bottom: 1rem;
-    }
-    .editor-box textarea {
-      width: 100%;
-      min-height: calc(100vh - 240px);
-      border: none;
-      outline: none;
-      resize: vertical;
-      background: transparent;
-      color: var(--text);
-      font-family: ui-monospace, Menlo, Monaco, Consolas, monospace;
-      font-size: 15px;
-      line-height: 1.5;
-      padding: 12px;
-    }
+        html, body {
+            height: 100%
+        }
 
-    /* quiz */
-    #quiz {margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border)}
-    .blur {filter: blur(5px); cursor:pointer}
-    .blur.revealed {filter:none}
+        body {
+            margin: 0;
+            background: radial-gradient(800px 600px at 10% -10%, rgba(122, 162, 247, .09), transparent) no-repeat fixed,
+            var(--bg);
+            color: var(--text);
+            font-family: var(--font-ui);
+            line-height: 1.6;
+            padding: 28px
+        }
 
-    /* ask AI */
-    #ask-ai {margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border)}
-    #ask-ai div.ai-row {display:flex; gap:.5rem; align-items:flex-start; margin-bottom:.5rem;}
-    #ask-ai textarea{
-      flex:1;
-      padding:.6em;
-      border-radius:8px;
-      border:1px solid var(--border);
-      background:var(--panel);
-      color:var(--text);
-      resize:vertical;
-    }
-    #ask-ai button{
-      padding:.5em 1em;
-      border:none;
-      border-radius:8px;
-      background:var(--brand);
-      color:#fff;
-      cursor:pointer;
-      transition:opacity .2s ease;
-    }
-    #ask-ai button:hover{opacity:.9}
-    #ai-answer{
-      margin-top:.6rem;
-      padding:.8em;
-      border-radius:8px;
-      background:rgba(122,162,247,.05);
-      max-height:200px;
-      overflow:auto;
-      white-space:pre-wrap;
-    }
+        .card {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .02), transparent);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            padding: 22px
+        }
 
-    @media (max-width:720px){
-      body{padding:14px}
-      .card{padding:14px}
-      .preview h1{font-size:1.4rem}
-      .editor-box textarea{min-height:50vh}
-    }
-  </style>
+        .preview {
+            padding: 8px 2px 18px 2px
+        }
+
+        .preview h1 {
+            font-size: 2rem;
+            margin-top: 1rem
+        }
+
+        .preview h2 {
+            font-size: 1.5rem
+        }
+
+        .preview p {
+            margin: .6em 0
+        }
+
+        .preview a {
+            color: var(--brand)
+        }
+
+        .preview blockquote {
+            border-left: 3px solid var(--brand);
+            padding: .5em 1em;
+            background: rgba(122, 162, 247, .03);
+            border-radius: 8px
+        }
+
+        .preview code {
+            font-family: ui-monospace, Menlo, Monaco, Consolas, monospace;
+            padding: .12em .35em;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, .04)
+        }
+
+        .preview pre {
+            background: var(--code-bg);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            overflow: auto
+        }
+
+        .preview table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0
+        }
+
+        .preview th, .preview td {
+            border: 1px solid var(--border);
+            padding: .5em .6em
+        }
+
+        .preview img {
+            max-width: 100%;
+            border-radius: 8px;
+            border: 1px solid var(--border)
+        }
+
+        /* Панель управления */
+        #editor-controls {
+            display: none;
+            gap: .6rem;
+            margin-bottom: 1rem;
+        }
+
+        #editor-controls button {
+            padding: .45em 1em;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background .2s ease, opacity .2s ease;
+        }
+
+        #editBtn, #saveBtn {
+            background: var(--brand);
+            color: #fff;
+        }
+
+        #editBtn.cancel {
+            background: #555; /* серый при редактировании */
+        }
+
+        #editor-controls button:hover {
+            opacity: .85;
+        }
+
+        /* Редактор */
+        .editor-box {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0;
+            margin-bottom: 1rem;
+        }
+
+        .editor-box textarea {
+            width: 100%;
+            min-height: calc(100vh - 240px);
+            border: none;
+            outline: none;
+            resize: vertical;
+            background: transparent;
+            color: var(--text);
+            font-family: ui-monospace, Menlo, Monaco, Consolas, monospace;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px;
+        }
+
+        /* quiz */
+        #quiz {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border)
+        }
+
+        .blur {
+            filter: blur(5px);
+            cursor: pointer
+        }
+
+        .blur.revealed {
+            filter: none
+        }
+
+        /* ask AI */
+        #ask-ai {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border)
+        }
+
+        #ask-ai div.ai-row {
+            display: flex;
+            gap: .5rem;
+            align-items: flex-start;
+            margin-bottom: .5rem;
+        }
+
+        #ask-ai textarea {
+            flex: 1;
+            padding: .6em;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--panel);
+            color: var(--text);
+            resize: vertical;
+        }
+
+        #ask-ai button {
+            padding: .5em 1em;
+            border: none;
+            border-radius: 8px;
+            background: var(--brand);
+            color: #fff;
+            cursor: pointer;
+            transition: opacity .2s ease;
+        }
+
+        #ask-ai button:hover {
+            opacity: .9
+        }
+
+        #ai-answer {
+            margin-top: .6rem;
+            padding: .8em;
+            border-radius: 8px;
+            background: rgba(122, 162, 247, .05);
+            max-height: 200px;
+            overflow: auto;
+            white-space: pre-wrap;
+        }
+
+        @media (max-width: 720px) {
+            body {
+                padding: 14px
+            }
+
+            .card {
+                padding: 14px
+            }
+
+            .preview h1 {
+                font-size: 1.4rem
+            }
+
+            .editor-box textarea {
+                min-height: 50vh
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="card" role="main">
+<div class="card" role="main">
     <div id="editor-controls">
-      <button id="editBtn">✏️ Редактировать</button>
-      <button id="saveBtn" style="display:none;">💾 Сохранить</button>
+        <button id="editBtn">✏️ Редактировать</button>
+        <button id="saveBtn" style="display:none;">💾 Сохранить</button>
     </div>
 
     <article id="preview" class="preview" aria-live="polite"></article>
 
     <!-- Мини-тест -->
     <section id="quiz">
-      <h2>Проверь себя</h2>
-      <div class="qa">
-        <p><b>Вопрос:</b> Что такое замыкание в JS?</p>
-        <p><b>Ответ:</b> <span class="blur">Замыкание — это функция, которая запоминает своё лексическое окружение даже после выхода из него.</span></p>
-      </div>
+        <h2>Проверь себя</h2>
+        <div class="qa">
+            <p><b>Вопрос:</b> Что такое замыкание в JS?</p>
+            <p><b>Ответ:</b> <span class="blur">Замыкание — это функция, которая запоминает своё лексическое окружение даже после выхода из него.</span>
+            </p>
+        </div>
     </section>
 
     <!-- Вопрос к AI -->
     <section id="ask-ai">
-      <h2>Задай вопрос AI</h2>
-      <div class="ai-row">
-        <textarea id="ai-question" rows="3" placeholder="Напиши свой вопрос..."></textarea>
-        <button id="askBtn">🤖 Спросить</button>
-      </div>
-      <div id="ai-answer" class="muted"></div>
+        <h2>Задай вопрос AI</h2>
+        <div class="ai-row">
+            <textarea id="ai-question" rows="3" placeholder="Напиши свой вопрос..."></textarea>
+            <button id="askBtn">🤖 Спросить</button>
+        </div>
+        <div id="ai-answer" class="muted"></div>
     </section>
-  </div>
+</div>
 
-  <script>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    let apikey = urlParams.get('apikey');
+
+    if (apikey == null) {
+       apikey = localStorage.getItem('apikey');
+
+    } else {
+        localStorage.setItem('apikey', apikey);
+        document.location.search = '';
+    }
+
     let MARKDOWN = ``;
     const lecture_id = '{{lecture_id}}';
-    const apikey = window.apikey || 'test';
     const preview = document.getElementById('preview');
     const editBtn = document.getElementById('editBtn');
     const saveBtn = document.getElementById('saveBtn');
     const controls = document.getElementById('editor-controls');
 
     async function get_text() {
-      let res = await fetch(`/lecture/${lecture_id}/data`);
-      const data = await res.json();
-      MARKDOWN = data['summarized_text'];
+        let res = await fetch(`/lecture/${lecture_id}/data`);
+        const data = await res.json();
+        MARKDOWN = data['summarized_text'];
     }
 
     marked.setOptions({
-      gfm: true, breaks: true, headerIds: true, mangle: false, smartLists: true,
-      highlight: (code, lang) => {
-        try { if(lang && hljs.getLanguage(lang)) return hljs.highlight(code, {language:lang}).value } catch(_) {}
-        try { return hljs.highlightAuto(code).value } catch(_) { return code }
-      }
+        gfm: true, breaks: true, headerIds: true, mangle: false, smartLists: true,
+        highlight: (code, lang) => {
+            try {
+                if (lang && hljs.getLanguage(lang)) return hljs.highlight(code, {language: lang}).value
+            } catch (_) {
+            }
+            try {
+                return hljs.highlightAuto(code).value
+            } catch (_) {
+                return code
+            }
+        }
     });
 
-    function render(md){
-      const html = marked.parse(md);
-      const clean = DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
-      preview.innerHTML = clean;
-      preview.querySelectorAll('a[href]').forEach(a => { a.target = '_blank'; a.rel = 'noopener noreferrer nofollow' });
-      preview.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+    function render(md) {
+        const html = marked.parse(md);
+        const clean = DOMPurify.sanitize(html, {USE_PROFILES: {html: true}});
+        preview.innerHTML = clean;
+        preview.querySelectorAll('a[href]').forEach(a => {
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer nofollow'
+        });
+        preview.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
     }
 
     get_text().then(() => render(MARKDOWN));
@@ -210,53 +333,53 @@
     let editorBox, textarea;
 
     editBtn.onclick = () => {
-      if (!editing) {
-        editorBox = document.createElement('div');
-        editorBox.className = 'editor-box';
-        textarea = document.createElement('textarea');
-        textarea.value = MARKDOWN;
-        editorBox.appendChild(textarea);
-        preview.replaceWith(editorBox);
+        if (!editing) {
+            editorBox = document.createElement('div');
+            editorBox.className = 'editor-box';
+            textarea = document.createElement('textarea');
+            textarea.value = MARKDOWN;
+            editorBox.appendChild(textarea);
+            preview.replaceWith(editorBox);
 
-        editBtn.textContent = "✖ Отмена";
-        editBtn.classList.add("cancel");
-        saveBtn.style.display = "inline-block";
+            editBtn.textContent = "✖ Отмена";
+            editBtn.classList.add("cancel");
+            saveBtn.style.display = "inline-block";
 
-        textarea.focus();
-        editing = true;
-      } else {
-        editorBox.replaceWith(preview);
-        editBtn.textContent = "✏️ Редактировать";
-        editBtn.classList.remove("cancel");
-        saveBtn.style.display = "none";
-        editing = false;
-      }
+            textarea.focus();
+            editing = true;
+        } else {
+            editorBox.replaceWith(preview);
+            editBtn.textContent = "✏️ Редактировать";
+            editBtn.classList.remove("cancel");
+            saveBtn.style.display = "none";
+            editing = false;
+        }
     };
 
     saveBtn.onclick = async () => {
-      if (editing) {
-        const newMd = textarea.value;
-        let res = await fetch(`/lecture/${lecture_id}/edit`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apikey}` },
-          body: JSON.stringify({ summarized_text: newMd })
-        });
-        if (res.ok) {
-          MARKDOWN = newMd;
-          render(MARKDOWN);
-          editorBox.replaceWith(preview);
-          editBtn.textContent = "✏️ Редактировать";
-          editBtn.classList.remove("cancel");
-          saveBtn.style.display = "none";
-          editing = false;
+        if (editing) {
+            const newMd = textarea.value;
+            let res = await fetch(`/lecture/${lecture_id}/edit`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apikey}`},
+                body: JSON.stringify({summarized_text: newMd})
+            });
+            if (res.ok) {
+                MARKDOWN = newMd;
+                render(MARKDOWN);
+                editorBox.replaceWith(preview);
+                editBtn.textContent = "✏️ Редактировать";
+                editBtn.classList.remove("cancel");
+                saveBtn.style.display = "none";
+                editing = false;
+            }
         }
-      }
     };
 
     document.addEventListener('click', e => {
-      if (e.target.classList.contains('blur')) {
-        e.target.classList.toggle('revealed');
-      }
+        if (e.target.classList.contains('blur')) {
+            e.target.classList.toggle('revealed');
+        }
     });
 
     // Ask AI с ограничением 3 сек
@@ -264,34 +387,42 @@
     const askBtn = document.getElementById('askBtn');
     const aiAnswer = document.getElementById('ai-answer');
     askBtn.onclick = async () => {
-      const now = Date.now();
-      if (now - lastAskTime < 3000) { alert('Подожди пару секунд перед новым запросом...'); return; }
-      lastAskTime = now;
+        const now = Date.now();
+        if (now - lastAskTime < 3000) {
+            alert('Подожди пару секунд перед новым запросом...');
+            return;
+        }
+        lastAskTime = now;
 
-      const q = document.getElementById('ai-question').value.trim();
-      if (!q) return;
+        const q = document.getElementById('ai-question').value.trim();
+        if (!q) return;
 
-      askBtn.disabled = true;
-      askBtn.style.opacity = '0.6';
-      aiAnswer.textContent = "⏳ Думаю...";
+        askBtn.disabled = true;
+        askBtn.style.opacity = '0.6';
+        aiAnswer.textContent = "⏳ Думаю...";
 
-      try {
-        const res = await fetch(`/lecture/${lecture_id}/ask`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question: q })
-        });
-        const data = await res.json();
-        aiAnswer.textContent = data['answer'] || "❌ Нет ответа";
-      } catch(e) {
-        aiAnswer.textContent = "❌ Ошибка запроса";
-      }
+        try {
+            const res = await fetch(`/lecture/${lecture_id}/ask`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({question: q})
+            });
+            const data = await res.json();
+            aiAnswer.textContent = data['answer'] || "❌ Нет ответа";
+        } catch (e) {
+            aiAnswer.textContent = "❌ Ошибка запроса";
+        }
 
-      setTimeout(() => { askBtn.disabled = false; askBtn.style.opacity = '1'; }, 3000);
+        setTimeout(() => {
+            askBtn.disabled = false;
+            askBtn.style.opacity = '1';
+        }, 3000);
     };
 
-    window.setMarkdown = (md) => { render(md); };
+    window.setMarkdown = (md) => {
+        render(md);
+    };
     window.getHtml = () => preview.innerHTML;
-  </script>
+</script>
 </body>
 </html>

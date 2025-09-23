@@ -11,6 +11,7 @@ amqp_url = environ['AMQP_URL']
 
 openrouter_key = environ['OPENROUTER_KEY']
 bot_token = environ['BOT_TOKEN']
+jwt_secret = environ['JWT_SECRET']
 
 telegram_bot_api_server = environ.get('TELEGRAM_BOT_API_SERVER')
 model_cache_dir = environ.get("MODEL_CACHE_DIR", "./cache")

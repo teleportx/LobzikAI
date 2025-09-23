@@ -10,6 +10,7 @@ from watchfiles import awatch
 
 import db
 from processor import AsyncTeacherModel
+from utils.jwt_token import AuthorizeDep
 
 router = APIRouter(prefix='/lecture')
 templates = Jinja2Templates('templates')
@@ -20,7 +21,7 @@ class LectureEditModel(BaseModel):
 
 
 class LectureAskModel(BaseModel):
-    question: str = Field(max_length=10 ** 3)
+    question: str = Field(max_length=1000)
 
 
 teacher_model = AsyncTeacherModel()
@@ -55,11 +56,10 @@ async def handle_lecture_data(request: Request, lecture_id: uuid.UUID):
 
 
 @router.patch('/{lecture_id}/edit', status_code=204)
-async def handle_lecture_data(request: Request, lecture_id: uuid.UUID, body: LectureEditModel):
-    # TODO: auth!!
+async def handle_lecture_data(request: Request, auth: AuthorizeDep('lecture'), lecture_id: uuid.UUID, body: LectureEditModel):
     lecture = (await request.state.db.execute(
         update(db.Lecture)
-        .where(db.Lecture.id == lecture_id)
+        .where(db.Lecture.id == lecture_id, db.Lecture.owner_id == auth.get('user_id'))
         .values(summarized_text=body.summarized_text)
         .returning(db.Lecture.id)
     )).fetchone()
