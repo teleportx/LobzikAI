@@ -75,15 +75,18 @@ class AuthRawDepend:
 
     def parse_token(self, authorization: str) -> dict | None:
         token_parts = authorization.split()
-        assert len(token_parts) >= 2
+        if len(token_parts) < 2:
+            raise ValueError
 
         token_type = token_parts[0]
         token = ' '.join(token_parts[1:])
 
-        assert token_type == 'Bearer'
+        if token_type != 'Bearer':
+            raise ValueError
 
         payload = verify_token(token)
-        assert payload is not None
+        if payload is None:
+            raise ValueError
 
         return payload
 
@@ -91,8 +94,10 @@ class AuthRawDepend:
         try:
             return self.parse_token(authorization)
 
-        except AssertionError:
-            raise HTTPException(401, 'Invalid authorization token')
+        except ValueError:
+            if self.raise_exception:
+                raise HTTPException(401, 'Invalid authorization token')
+            return None
 
 
 def AuthorizeDep(typ: str | None, *, raise_exception: bool = True):
