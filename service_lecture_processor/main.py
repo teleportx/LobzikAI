@@ -64,12 +64,10 @@ async def on_message(message: DeliveredMessage):
 
         await session.commit()
 
-    print("ZOV")
-
     formatted_datetime = datetime.fromisoformat(body['created_at']).strftime('%d %b %Y %H:%M')
     await bot.send_message(
         body['owner_id'],
-        f'Your lecture <b>{result.title}</b> is ready!\n'
+        f'Your lecture <b>{result.summarizer_response.ai_response.title}</b> is ready!\n'
         f'<i>~ {formatted_datetime}</i>',
         reply_markup=keyboards.lecture.get_owned(lecture_id, body['owner_id']),
     )
