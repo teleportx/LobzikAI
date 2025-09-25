@@ -6,7 +6,7 @@ from .asr import AsyncAudioTranscriber
 from .test_maker import AsyncTestMaker
 from .teacher import AsyncTeacherModel
 
-from .schemas import ProcessorResponseModel
+from .schemas import ProcessorResponseModel, TestMakerResponseModel
 
 
 class LectureProcessor(BaseProcessor):
@@ -26,7 +26,7 @@ class LectureProcessor(BaseProcessor):
 
         summarize_result = await self.summarizer(text=extracted_text, session=session)
 
-        test_maker_result = []
+        test_maker_result = TestMakerResponseModel()
         if make_test:
             test_maker_result = await self.test_maker(text=summarize_result.ai_response.text, session=session)
 

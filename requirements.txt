@@ -10,3 +10,4 @@ loguru==0.7.3
 aiormq==6.9.0
 pydantic==2.11.7
 aiohttp==3.12.15
+PyJWT==2.10.1

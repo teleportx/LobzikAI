@@ -11,6 +11,7 @@ amqp_url = environ['AMQP_URL']
 
 openrouter_key = environ['OPENROUTER_KEY']
 bot_token = environ['BOT_TOKEN']
+jwt_secret = environ['JWT_SECRET']
 
 telegram_bot_api_server = environ.get('TELEGRAM_BOT_API_SERVER')
 model_cache_dir = environ.get("MODEL_CACHE_DIR", "./cache")
@@ -20,6 +21,8 @@ class Constants:
     db_pool_max_size = 5
     num_asr_workers = int(environ.get('NUM_ASR_WORKERS', 8))
     chunk_overlapping = float(environ.get("CHUNK_OVERLAPPING", 2.0))
+
+    lecture_token_ttl = 365 * 24 * 60 * 60
 
 
 class AIModels:
