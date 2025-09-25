@@ -85,7 +85,7 @@ class AsyncTextSummarizer(BaseProcessor):
             data = await response.json()
             try:
                 message = json.loads(data["choices"][0]["message"]["content"])
-            except:
+            except json.JSONDecodeError:
                 raise ValueError("Summarizer response structure can't be correctly decoded.")
 
         return SummarizerResponseModel(
