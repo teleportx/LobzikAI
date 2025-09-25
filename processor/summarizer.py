@@ -83,7 +83,10 @@ class AsyncTextSummarizer(BaseProcessor):
         async with session.post(self.url, headers=self.headers, json=json_body) as response:
             response.raise_for_status()
             data = await response.json()
-            message = json.loads(data["choices"][0]["message"]["content"])
+            try:
+                message = json.loads(data["choices"][0]["message"]["content"])
+            except:
+                raise ValueError("Summarizer response structure can't be correctly decoded.")
 
         return SummarizerResponseModel(
             ai_response=message,
