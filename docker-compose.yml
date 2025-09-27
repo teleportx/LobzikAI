@@ -8,16 +8,6 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ../data/telegram-bot-api-data:/var/lib/telegram-bot-api:ro
 
-  telegram-bot-api:
-    image: aiogram/telegram-bot-api:latest
-    restart: unless-stopped
-    env_file:
-      - .env
-    environment:
-      - TELEGRAM_LOCAL=TRUE
-    volumes:
-      - ../data/telegram-bot-api-data:/var/lib/telegram-bot-api
-
   service-bot:
     build:
       context: ./
@@ -25,9 +15,6 @@ services:
     restart: unless-stopped
     env_file:
       - integrated.env
-    depends_on:
-      - telegram-bot-api
-      - nginx
 
   service-web:
     build:
