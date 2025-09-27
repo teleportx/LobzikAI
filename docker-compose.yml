@@ -13,31 +13,23 @@ services:
       context: ./
       dockerfile: service_bot/Dockerfile
     restart: unless-stopped
-    env_file:
-      - integrated.env
 
   service-web:
     build:
       context: ./
       dockerfile: service_web/Dockerfile
-    env_file:
-      - integrated.env
     restart: unless-stopped
 
   service-lecture-processor:
     build:
       context: ./
       dockerfile: service_lecture_processor/Dockerfile
-    env_file:
-      - integrated.env
     restart: unless-stopped
 
   service-asr:
     build:
       context: ./
       dockerfile: service_asr/Dockerfile
-    env_file:
-      - integrated.env
     restart: unless-stopped
     volumes:
       - ../data/cache:/app/cache
