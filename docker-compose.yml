@@ -6,7 +6,6 @@ services:
       - "19022:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ../data/telegram-bot-api-data:/var/lib/telegram-bot-api:ro
 
   service-bot:
     build:
