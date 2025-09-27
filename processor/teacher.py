@@ -11,6 +11,7 @@ class AsyncTeacherModel(BaseProcessor):
         super().__init__()
         self.system_prompt = """You are teacher. You've been provided some facts from lecture.
         Some student asks question about the lecture. Your task - give him correct answer.
+        If lecture doesn't contain any information about student's question - use your own knowledge.
         """
 
         self.model = config.AIModels.base_gpt_model
