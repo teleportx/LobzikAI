@@ -3,7 +3,7 @@ services:
     image: nginx:latest
     restart: unless-stopped
     ports:
-      - "19022:80"
+      - "${BIND_PORT}:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
 
