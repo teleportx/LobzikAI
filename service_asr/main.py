@@ -18,16 +18,13 @@ import config
 
 from utils.get_bot_api_session import get_bot_api_session
 
-from multi_thread_asr import MultiThreadSpeechToText
+from asr import ASRModel
 
 
 setup_logger.__init__('Service ASR')
 
 bot = Bot(config.bot_token, session=get_bot_api_session())
-model = MultiThreadSpeechToText(
-    workers=config.Constants.num_asr_workers,
-    chunk_overlapping=config.Constants.chunk_overlapping
-)
+model = ASRModel()
 
 
 async def on_message(message: DeliveredMessage):
