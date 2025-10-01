@@ -5,6 +5,8 @@ import os
 import wave
 import json
 import concurrent.futures
+
+from loguru import logger
 from vosk import Model, KaldiRecognizer
 
 from utils.download_and_extract_zip import download_and_extract_zip
@@ -19,6 +21,7 @@ class MultiThreadSpeechToText:
         self.saving_path = os.path.join(config.model_cache_dir, self.model_name)
 
         if not os.path.exists(self.saving_path):
+            logger.info('Vosk model doesn\'t exists. Start downloading...')
             download_and_extract_zip(
                 url=f"https://alphacephei.com/vosk/models/{self.model_name}.zip",
                 save_dir=config.model_cache_dir,
