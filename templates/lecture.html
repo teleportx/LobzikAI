@@ -221,9 +221,8 @@
             padding: .8em;
             border-radius: 8px;
             background: rgba(122, 162, 247, .05);
-            max-height: 200px;
-            overflow: auto;
-            white-space: pre-wrap;
+            /*white-space: pre-wrap;  !* переносы строк *!*/
+            overflow: visible;      /* чтобы точно не резалось */
         }
 
         @media (max-width: 720px) {
@@ -395,6 +394,22 @@
         }
     });
 
+    function renderAI(md) {
+        const html = marked.parse(md);
+        const clean = DOMPurify.sanitize(html, {USE_PROFILES: {html: true}});
+        aiAnswer.innerHTML = clean;
+        aiAnswer.querySelectorAll('a[href]').forEach(a => {
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer nofollow';
+        });
+
+        if (window.hljs) {
+            aiAnswer.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+        }
+    }
+
+
+
     // Ask AI с ограничением 3 сек
     let lastAskTime = 0;
     const askBtn = document.getElementById('askBtn');
@@ -412,7 +427,7 @@
 
         askBtn.disabled = true;
         askBtn.style.opacity = '0.6';
-        aiAnswer.textContent = "⏳ Думаю...";
+        renderAI("⏳ Думаю...");
 
         try {
             const res = await fetch(`/lecture/${lecture_id}/ask`, {
@@ -421,9 +436,11 @@
                 body: JSON.stringify({question: q})
             });
             const data = await res.json();
-            aiAnswer.textContent = data['answer'] || "❌ Нет ответа";
+            renderAI(data['answer'] || "❌ Нет ответа");
+
         } catch (e) {
-            aiAnswer.textContent = "❌ Ошибка запроса";
+            console.error(e);
+            renderAI("❌ Ошибка запроса");
         }
 
         setTimeout(() => {
