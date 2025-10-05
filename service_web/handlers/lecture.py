@@ -44,7 +44,7 @@ async def handle_lecture_html(request: Request, lecture_id: uuid.UUID):
 @router.get('/{lecture_id}/data')
 async def handle_lecture_data(request: Request, lecture_id: uuid.UUID):
     lecture = (await request.state.db.execute(
-        select(db.Lecture.summarized_text, db.Lecture.show_questions_section, db.Lecture.show_askai_section)
+        select(db.Lecture.title, db.Lecture.summarized_text, db.Lecture.show_questions_section, db.Lecture.show_askai_section)
         .where(db.Lecture.id == lecture_id)
     )).fetchone()
 
@@ -59,6 +59,7 @@ async def handle_lecture_data(request: Request, lecture_id: uuid.UUID):
         )).fetchall())
 
     return {
+        'title': lecture.title,
         'summarized_text': lecture.summarized_text,
         'show_questions_section': lecture.show_questions_section,
         'show_askai_section': lecture.show_askai_section,
