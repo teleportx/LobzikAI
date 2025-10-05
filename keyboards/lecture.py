@@ -37,7 +37,7 @@ def get_owned(lecture_id: uuid.UUID, user_id: int, show_questions_section: bool,
 
     mark = ['❌', '✅']
     builder.button(
-        text=mark[show_questions_section] + ' Show test questions section',
+        text=mark[show_questions_section] + ' Show Test questions section',
         callback_data=LectureMarkEditCallbackData(lecture_id=lecture_id, field='show_questions_section', value=not show_questions_section),
     )
 
