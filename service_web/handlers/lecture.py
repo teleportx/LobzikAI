@@ -87,12 +87,15 @@ async def handle_lecture_data(request: Request, auth: AuthorizeDep('lecture'), l
 @router.post('/{lecture_id}/ask')
 async def handle_lecture_data(request: Request, lecture_id: uuid.UUID, body: LectureAskModel):
     lecture = (await request.state.db.execute(
-        select(db.Lecture.summarized_text)
+        select(db.Lecture.summarized_text, db.Lecture.show_askai_section)
         .where(db.Lecture.id == lecture_id)
     )).fetchone()
 
     if lecture is None:
         raise HTTPException(404, 'Lecture not found')
+
+    if not lecture.show_askai_section:
+        raise HTTPException(403, 'Ask ai disabled for this lecture')
 
     return {
         'answer': (await call_teacher_model(lecture.summarized_text, body.question)).text
