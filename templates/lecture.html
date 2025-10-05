@@ -255,12 +255,6 @@
 
     <!-- Мини-тест -->
     <section id="quiz">
-        <h2>Проверь себя</h2>
-        <div class="qa">
-            <p><b>Вопрос:</b> Что такое замыкание в JS?</p>
-            <p><b>Ответ:</b> <span class="blur">Замыкание — это функция, которая запоминает своё лексическое окружение даже после выхода из него.</span>
-            </p>
-        </div>
     </section>
 
     <!-- Вопрос к AI -->
@@ -292,11 +286,28 @@
     const editBtn = document.getElementById('editBtn');
     const saveBtn = document.getElementById('saveBtn');
     const controls = document.getElementById('editor-controls');
+    const quiz = document.getElementById('quiz');
+    const ask_ai = document.getElementById('ask-ai');
 
     async function get_text() {
         let res = await fetch(`/lecture/${lecture_id}/data`);
         const data = await res.json();
+
         MARKDOWN = data['summarized_text'];
+
+        if (!data['show_questions_section']) {
+            quiz.style.display = 'none';
+        }
+
+        if (!data['show_askai_section']) {
+            ask_ai.style.display = 'none';
+        }
+
+        for (i in data['questions']) {
+            const question = document.createElement('div');
+            question.innerHTML = `<p><b>Вопрос:</b> ${data['questions'][i]['text']}</p><p><b>Ответ:</b> <span class="blur">${data['questions'][i]['answer']}</span></p>`;
+            quiz.appendChild(question);
+        }
     }
 
     marked.setOptions({
