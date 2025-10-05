@@ -14,7 +14,7 @@ async def handle_lecture(message: types.Message, dbconn: AsyncSession):
     lecture_id = message.reply_markup.inline_keyboard[0][0].url.replace(config.host + '/lecture/', '')
 
     lecture = (await dbconn.execute(
-        select(db.Lecture.id, db.Lecture.title, db.Lecture.owner_id, db.Lecture.created_at)
+        select(db.Lecture.id, db.Lecture.title, db.Lecture.owner_id, db.Lecture.created_at, db.Lecture.show_questions_section, db.Lecture.show_askai_section)
         .where(db.Lecture.id == lecture_id, db.Lecture.owner_id == message.from_user.id)
     )).fetchone()
 
@@ -26,5 +26,5 @@ async def handle_lecture(message: types.Message, dbconn: AsyncSession):
     await message.reply(
         f'Lecture <b>{lecture.title}</b> panel\n'
         f'<i>~ {formatted_datetime}</i>',
-        reply_markup=keyboards.lecture.get_owned(lecture.id, lecture.owner_id),
+        reply_markup=keyboards.lecture.get_owned(lecture.id, lecture.owner_id, lecture.show_questions_section, lecture.show_askai_section),
     )
