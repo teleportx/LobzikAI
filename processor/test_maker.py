@@ -4,7 +4,7 @@ from aiohttp import ClientSession
 
 from .base import BaseProcessor
 
-from .schemas import TestMakerResponseModel
+from .schemas import TestMakerResponseModel, TestSampleModel
 import config
 
 
@@ -89,10 +89,13 @@ class AsyncTestMaker(BaseProcessor):
             response.raise_for_status()
             data = await response.json()
             try:
-                message = json.loads(data["choices"][0]["message"]["content"])
-            except json.JSONDecodeError:
+                raw_response = data["choices"][0]["message"]["content"]
+                message = json.loads(raw_response)["test_samples"]
+            except (json.JSONDecodeError, KeyError):
                 message = []
 
         return TestMakerResponseModel(
-            test_samples=message
+            test_samples=message,
+            raw_model_response=raw_response,
+            is_success=bool(message),
         )
