@@ -3,10 +3,11 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>Markdown Preview — Dark Theme</title>
+    <title>LobzikAI</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.jpg">
     <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/highlight.min.js"></script>
     <style>
         :root {
@@ -220,9 +221,8 @@
             padding: .8em;
             border-radius: 8px;
             background: rgba(122, 162, 247, .05);
-            max-height: 200px;
-            overflow: auto;
-            white-space: pre-wrap;
+            /*white-space: pre-wrap;  !* переносы строк *!*/
+            overflow: visible;      /* чтобы точно не резалось */
         }
 
         @media (max-width: 720px) {
@@ -256,11 +256,6 @@
     <!-- Мини-тест -->
     <section id="quiz">
         <h2>Проверь себя</h2>
-        <div class="qa">
-            <p><b>Вопрос:</b> Что такое замыкание в JS?</p>
-            <p><b>Ответ:</b> <span class="blur">Замыкание — это функция, которая запоминает своё лексическое окружение даже после выхода из него.</span>
-            </p>
-        </div>
     </section>
 
     <!-- Вопрос к AI -->
@@ -292,11 +287,29 @@
     const editBtn = document.getElementById('editBtn');
     const saveBtn = document.getElementById('saveBtn');
     const controls = document.getElementById('editor-controls');
+    const quiz = document.getElementById('quiz');
+    const ask_ai = document.getElementById('ask-ai');
 
     async function get_text() {
         let res = await fetch(`/lecture/${lecture_id}/data`);
         const data = await res.json();
+
         MARKDOWN = data['summarized_text'];
+        document.title = `${data['title']}`
+
+        if (!data['show_questions_section']) {
+            quiz.style.display = 'none';
+        }
+
+        if (!data['show_askai_section']) {
+            ask_ai.style.display = 'none';
+        }
+
+        for (i in data['questions']) {
+            const question = document.createElement('div');
+            question.innerHTML = `<p><b>Вопрос:</b> ${data['questions'][i]['text']}</p><p><b>Ответ:</b> <span class="blur">${data['questions'][i]['answer']}</span></p>`;
+            quiz.appendChild(question);
+        }
     }
 
     marked.setOptions({
@@ -382,6 +395,22 @@
         }
     });
 
+    function renderAI(md) {
+        const html = marked.parse(md);
+        const clean = DOMPurify.sanitize(html, {USE_PROFILES: {html: true}});
+        aiAnswer.innerHTML = clean;
+        aiAnswer.querySelectorAll('a[href]').forEach(a => {
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer nofollow';
+        });
+
+        if (window.hljs) {
+            aiAnswer.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+        }
+    }
+
+
+
     // Ask AI с ограничением 3 сек
     let lastAskTime = 0;
     const askBtn = document.getElementById('askBtn');
@@ -399,7 +428,7 @@
 
         askBtn.disabled = true;
         askBtn.style.opacity = '0.6';
-        aiAnswer.textContent = "⏳ Думаю...";
+        renderAI("⏳ Думаю...");
 
         try {
             const res = await fetch(`/lecture/${lecture_id}/ask`, {
@@ -408,9 +437,11 @@
                 body: JSON.stringify({question: q})
             });
             const data = await res.json();
-            aiAnswer.textContent = data['answer'] || "❌ Нет ответа";
+            renderAI(data['answer'] || "❌ Нет ответа");
+
         } catch (e) {
-            aiAnswer.textContent = "❌ Ошибка запроса";
+            console.error(e);
+            renderAI("❌ Ошибка запроса");
         }
 
         setTimeout(() => {

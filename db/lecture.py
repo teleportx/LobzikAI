@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Text, UUID, ForeignKey, DateTime, func, String
+from sqlalchemy import Text, UUID, ForeignKey, DateTime, func, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import BaseDBModel
@@ -16,6 +16,9 @@ class Lecture(BaseDBModel):
     title: Mapped[str] = mapped_column(String(128))
     raw_text: Mapped[str] = mapped_column(Text())
     summarized_text: Mapped[str] = mapped_column(Text())
+
+    show_questions_section: Mapped[bool] = mapped_column(Boolean(), server_default='false')
+    show_askai_section: Mapped[bool] = mapped_column(Boolean(), server_default='false')
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

@@ -1,5 +1,7 @@
 import sys
 
+from starlette.staticfiles import StaticFiles
+
 sys.path.append('.')
 sys.path.append('service_web')
 
@@ -39,3 +41,5 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.add_middleware(DatabaseMiddleware)
 app.include_router(handlers.router)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")

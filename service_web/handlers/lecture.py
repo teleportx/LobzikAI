@@ -10,6 +10,7 @@ from watchfiles import awatch
 
 import db
 from processor import AsyncTeacherModel
+from utils.first_get import first_get
 from utils.jwt_token import AuthorizeDep
 
 router = APIRouter(prefix='/lecture')
@@ -43,15 +44,30 @@ async def handle_lecture_html(request: Request, lecture_id: uuid.UUID):
 @router.get('/{lecture_id}/data')
 async def handle_lecture_data(request: Request, lecture_id: uuid.UUID):
     lecture = (await request.state.db.execute(
-        select(db.Lecture.summarized_text)
+        select(db.Lecture.title, db.Lecture.summarized_text, db.Lecture.show_questions_section, db.Lecture.show_askai_section)
         .where(db.Lecture.id == lecture_id)
     )).fetchone()
 
     if lecture is None:
         raise HTTPException(404, 'Lecture not found')
 
+    questions = []
+    if lecture.show_questions_section:
+        questions = first_get((await request.state.db.execute(
+            select(db.LectureTestQuestion)
+            .where(db.LectureTestQuestion.lecture_id == lecture_id)
+        )).fetchall())
+
     return {
-        'summarized_text': lecture.summarized_text
+        'title': lecture.title,
+        'summarized_text': lecture.summarized_text,
+        'show_questions_section': lecture.show_questions_section,
+        'show_askai_section': lecture.show_askai_section,
+
+        'questions': [{
+            'text': el.text,
+            'answer': el.answer,
+        } for el in questions]
     }
 
 
@@ -71,12 +87,15 @@ async def handle_lecture_data(request: Request, auth: AuthorizeDep('lecture'), l
 @router.post('/{lecture_id}/ask')
 async def handle_lecture_data(request: Request, lecture_id: uuid.UUID, body: LectureAskModel):
     lecture = (await request.state.db.execute(
-        select(db.Lecture.summarized_text)
+        select(db.Lecture.summarized_text, db.Lecture.show_askai_section)
         .where(db.Lecture.id == lecture_id)
     )).fetchone()
 
     if lecture is None:
         raise HTTPException(404, 'Lecture not found')
+
+    if not lecture.show_askai_section:
+        raise HTTPException(403, 'Ask ai disabled for this lecture')
 
     return {
         'answer': (await call_teacher_model(lecture.summarized_text, body.question)).text

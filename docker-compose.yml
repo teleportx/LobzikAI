@@ -1,9 +1,14 @@
+networks:
+  coolify:
+    name: coolify
+    external: true
+
 services:
   nginx:
     image: nginx:latest
     restart: unless-stopped
     ports:
-      - "19022:80"
+      - "${BIND_PORT}:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
 
@@ -12,18 +17,24 @@ services:
       context: ./
       dockerfile: service_bot/Dockerfile
     restart: unless-stopped
+    networks:
+      - coolify
 
   service-web:
     build:
       context: ./
       dockerfile: service_web/Dockerfile
     restart: unless-stopped
+    networks:
+      - coolify
 
   service-lecture-processor:
     build:
       context: ./
       dockerfile: service_lecture_processor/Dockerfile
     restart: unless-stopped
+    networks:
+      - coolify
 
   service-asr:
     build:
@@ -32,3 +43,5 @@ services:
     restart: unless-stopped
     volumes:
       - ../data/cache:/app/cache
+    networks:
+      - coolify
