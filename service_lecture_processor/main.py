@@ -42,12 +42,17 @@ async def on_message(message: DeliveredMessage):
         )
 
     async with db.base.Session() as session:
+        show_questions_section = False
+        show_askai_section = False
+
         lecture_id = (await session.execute(
             insert(db.Lecture).values(
                 owner_id=body['owner_id'],
                 title=result.summarizer_response.ai_response.title,
                 raw_text=result.summarizer_response.raw_text,
                 summarized_text=result.summarizer_response.ai_response.text,
+                show_questions_section=show_questions_section,
+                show_askai_section=show_askai_section,
                 created_at=datetime.fromisoformat(body['created_at']),
             )
             .returning(db.Lecture.id)
@@ -69,7 +74,7 @@ async def on_message(message: DeliveredMessage):
         body['owner_id'],
         f'Your lecture <b>{result.summarizer_response.ai_response.title}</b> is ready!\n'
         f'<i>~ {formatted_datetime}</i>',
-        reply_markup=keyboards.lecture.get_owned(lecture_id, body['owner_id']),
+        reply_markup=keyboards.lecture.get_owned(lecture_id, body['owner_id'], show_questions_section, show_askai_section),
     )
 
     await message.channel.basic_ack(message.delivery_tag)  # set message is proceed
