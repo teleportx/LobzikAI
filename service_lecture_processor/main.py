@@ -38,14 +38,11 @@ async def on_message(message: DeliveredMessage):
         result = await lecture_processor(
             extracted_text=body["asr_result"],
             session=session,
-            make_test=False
+            make_test=True,
         )
 
     if not result.test_maker_response.is_success:
         logger.error(f"Failed to process TestMaker response: {result.test_maker_response.raw_model_response}")
-
-    logger.info(f"""Summarizer response: {result.summarizer_response.ai_response.text}
-                    TestMaker response {result.test_maker_response.test_samples}""")
 
     async with db.base.Session() as session:
         show_questions_section = False
