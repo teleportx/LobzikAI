@@ -23,6 +23,8 @@ class TestSampleModel(BaseModel):
 
 class TestMakerResponseModel(BaseModel):
     test_samples: List[TestSampleModel] = Field(default=[])
+    raw_model_response: str = Field(default="")
+    is_success: bool = Field(default=True)
 
 
 class ProcessorResponseModel(BaseModel):

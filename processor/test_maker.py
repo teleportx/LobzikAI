@@ -89,10 +89,13 @@ class AsyncTestMaker(BaseProcessor):
             response.raise_for_status()
             data = await response.json()
             try:
-                message = json.loads(data["choices"][0]["message"]["content"])
+                raw_response = data["choices"][0]["message"]["content"]
+                message = json.loads(raw_response)
             except json.JSONDecodeError:
                 message = []
 
         return TestMakerResponseModel(
-            test_samples=message
+            test_samples=message,
+            raw_model_response=raw_response,
+            is_success=bool(message),
         )

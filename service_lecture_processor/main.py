@@ -41,6 +41,9 @@ async def on_message(message: DeliveredMessage):
             make_test=False
         )
 
+    if not result.test_maker_response.is_success:
+        logger.error(f"Failed to process TestMaker response: {result.test_maker_response.raw_model_response}")
+
     async with db.base.Session() as session:
         lecture_id = (await session.execute(
             insert(db.Lecture).values(
