@@ -19,7 +19,7 @@ class ASRModel:
             )
 
     async def __call__(self, audio_base64: str) -> str:
-        if config.use_local_asr:
+        if not config.use_local_asr:
             async with ClientSession() as session:
                 result = await self.remote_model(audio_base64=audio_base64, session=session)
         else:
