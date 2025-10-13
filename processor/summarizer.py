@@ -74,6 +74,7 @@ class AsyncTextSummarizer(BaseProcessor):
             "messages": messages,
             "response_format": self._format_response_format(),
             "max_tokens": len(lecture_text) // 4,
+            "temperature": 0,
         }
 
     async def __call__(self, session: ClientSession, text: str) -> SummarizerResponseModel:
