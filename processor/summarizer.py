@@ -86,7 +86,11 @@ class AsyncTextSummarizer(BaseProcessor):
             try:
                 message = json.loads(data["choices"][0]["message"]["content"])
             except json.JSONDecodeError:
-                raise ValueError("Summarizer response structure can't be correctly decoded.")
+                raise ValueError(
+                    f"""Summarizer response structure can't be correctly decoded.
+                    Input text: {text}
+                    Model's response: {message}"""
+                )
 
         return SummarizerResponseModel(
             ai_response=message,
