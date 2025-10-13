@@ -79,6 +79,7 @@ class AsyncTestMaker(BaseProcessor):
             "model": self.model,
             "messages": messages,
             "response_format": self._format_response_format(),
+            "temperature": 0.1,
         }
 
     async def __call__(self, session: ClientSession, text: str) -> TestMakerResponseModel:
