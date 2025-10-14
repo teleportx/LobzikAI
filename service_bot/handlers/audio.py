@@ -5,7 +5,8 @@ import brocker
 router = Router()
 
 
-@router.message(F.audio, F.voice)
+@router.message(F.audio)
+@router.message(F.voice)
 async def handle_audio(message: types.Message):
     file_id = None
     if message.voice.file_id is not None:
