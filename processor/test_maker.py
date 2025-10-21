@@ -4,7 +4,7 @@ from aiohttp import ClientSession
 
 from .base import BaseProcessor
 
-from .schemas import TestMakerResponseModel, TestSampleModel
+from .schemas import TestMakerResponseModel
 import config
 
 
