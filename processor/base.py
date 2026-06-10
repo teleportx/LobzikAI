@@ -6,7 +6,7 @@ from config import openrouter_key
 class BaseProcessor(ABC):
     def __init__(self):
         self.api_key = openrouter_key
-        self.url = "https://openrouter.ai/api/v1/chat/completions"
+        self.url = "https://polza.ai/api/v1/chat/completions"
 
         self.headers = {
             "Authorization": f"Bearer {self.api_key}",
