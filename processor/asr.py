@@ -1,19 +1,21 @@
-from aiohttp import ClientSession
+from openai import AsyncOpenAI
 
 from .base import BaseProcessor
+from .schemas import TextModel
 
 import config
 
 
 class AsyncAudioTranscriber(BaseProcessor):
-    def __init__(self, chunk_size_mb: int = 4):
+    def __init__(self, client: AsyncOpenAI, chunk_size_mb: int = 4):
         super().__init__()
         self.model = config.AIModels.asr_model
         self.chunk_size = chunk_size_mb * 1024 * 1024
+        self.client = client
 
         self.system_prompt = """Transcribe user's audio"""
 
-    def _format_request_body(self, audio_base64: str):
+    async def _transcribe_chunk(self, audio_base64: str) -> str:
         messages = [
             {
                 "role": "system",
@@ -37,22 +39,13 @@ class AsyncAudioTranscriber(BaseProcessor):
                 ]
             }
         ]
-        return {
-            "model": self.model,
-            "messages": messages
-        }
+        response = await self.client.responses.parse(
+            model=self.model,
+            input=messages,
+        )
+        return response.output_text
 
-    async def _transcribe_chunk(self, session: ClientSession, audio_base64: str) -> str:
-        """Extract texts from audiofile"""
-        payload = self._format_request_body(audio_base64=audio_base64)
-
-        async with session.post(self.url, headers=self.headers, json=payload) as response:
-            response.raise_for_status()
-            data = await response.json()
-            result = data["choices"][0]["message"]["content"]
-            return result
-
-    async def __call__(self, session: ClientSession, audio_base64: str) -> str:
+    async def __call__(self, audio_base64: str) -> TextModel:
         chunks_count = (len(audio_base64) + self.chunk_size - 1) // self.chunk_size
         results = []
 
@@ -61,8 +54,9 @@ class AsyncAudioTranscriber(BaseProcessor):
             end = (i + 1) * self.chunk_size
             chunk = audio_base64[start:end]
 
-            text = await self._transcribe_chunk(session=session, audio_base64=chunk)
+            text = await self._transcribe_chunk(audio_base64=chunk)
             results.append(text)
 
-        return " ".join(results)
+        result_string = " ".join(results)
 
+        return TextModel(text=result_string)

@@ -9,7 +9,6 @@ host = environ['HOST']
 db_url = environ['DB_URL']
 amqp_url = environ['AMQP_URL']
 
-openrouter_key = environ['OPENROUTER_KEY']
 bot_token = environ['BOT_TOKEN']
 jwt_secret = environ['JWT_SECRET']
 

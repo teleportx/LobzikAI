@@ -1,6 +1,4 @@
-import json
-
-from aiohttp import ClientSession
+from openai import AsyncOpenAI
 
 from .base import BaseProcessor
 
@@ -9,7 +7,7 @@ import config
 
 
 class MultiModalProcessor(BaseProcessor):
-    def __init__(self):
+    def __init__(self, client: AsyncOpenAI):
         super().__init__()
 
         self.system_prompt = """You are an assistant who makes a brief of some lecture.
@@ -20,8 +18,9 @@ class MultiModalProcessor(BaseProcessor):
         """
 
         self.model = config.AIModels.mm_model
+        self.client = client
 
-    def _format_request_body(self, audio_base64: str) -> dict:
+    async def __call__(self, audio_base64: str):
         messages = [
             {
                 "role": "system",
@@ -45,19 +44,11 @@ class MultiModalProcessor(BaseProcessor):
                 ]
             }
         ]
-        response_format = SummarizerResponseModel.model_json_schema()
-        return {
-            "model": self.model,
-            "messages": messages,
-            "response_format": response_format,
-        }
 
-    async def __call__(self, session: ClientSession, audio_base64: str):
-        json_body = self._format_request_body(audio_base64=audio_base64)
+        response = await self.client.responses.parse(
+            model=self.model,
+            input=messages,
+            text_format=SummarizerResponseModel,
+        )
 
-        async with session.post(self.url, headers=self.headers, json=json_body) as response:
-            response.raise_for_status()
-            data = await response.json()
-            message = json.loads(data["choices"][0]["message"]["content"])
-
-        return SummarizerResponseModel(**message)
+        return response.output_parsed

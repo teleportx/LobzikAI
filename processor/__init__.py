@@ -1,10 +1,9 @@
-from aiohttp import ClientSession
+from openai import AsyncOpenAI
 
 from .base import BaseProcessor
 from .summarizer import AsyncTextSummarizer
 from .asr import AsyncAudioTranscriber
 from .test_maker import AsyncTestMaker
-from .teacher import AsyncTeacherModel
 
 from .schemas import ProcessorResponseModel, TestMakerResponseModel
 
@@ -13,22 +12,29 @@ class LectureProcessor(BaseProcessor):
     def __init__(self):
         super().__init__()
 
-        self.summarizer = AsyncTextSummarizer()
-        self.asr = AsyncAudioTranscriber()
-        self.test_maker = AsyncTestMaker()
+        self.client = AsyncOpenAI()
+
+        self.summarizer = AsyncTextSummarizer(client=self.client)
+        self.asr = AsyncAudioTranscriber(client=self.client)
+        self.test_maker = AsyncTestMaker(client=self.client)
 
     async def __call__(
             self,
-            session: ClientSession,
-            extracted_text: str,
+            extracted_text: str = "",
+            audio_base64: str = "",
             make_test: bool = False,
     ) -> ProcessorResponseModel:
 
-        summarize_result = await self.summarizer(text=extracted_text, session=session)
+        if not extracted_text:
+            if not audio_base64:
+                raise ValueError("No extracted text or audio provided")
+            extracted_text = await self.asr(audio_base64)
+
+        summarize_result = await self.summarizer(text=extracted_text)
 
         test_maker_result = TestMakerResponseModel()
         if make_test:
-            test_maker_result = await self.test_maker(text=summarize_result.ai_response.text, session=session)
+            test_maker_result = await self.test_maker(text=summarize_result.ai_response.text)
 
         return ProcessorResponseModel(
             summarizer_response=summarize_result,

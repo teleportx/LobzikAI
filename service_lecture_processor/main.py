@@ -41,9 +41,6 @@ async def on_message(message: DeliveredMessage):
             make_test=True,
         )
 
-    if not result.test_maker_response.is_success:
-        logger.error(f"Failed to process TestMaker response: {result.test_maker_response.raw_model_response}")
-
     async with db.base.Session() as session:
         show_questions_section = False
         show_askai_section = False

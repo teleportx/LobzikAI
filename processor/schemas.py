@@ -7,10 +7,6 @@ class TextModel(BaseModel):
     text: str
 
 
-class IsSuccessModel(BaseModel):
-    is_success: bool = Field(default=True)
-
-
 class SummarizerAIModel(TextModel):
     title: str
 
@@ -25,9 +21,8 @@ class TestSampleModel(BaseModel):
     answer: str
 
 
-class TestMakerResponseModel(IsSuccessModel):
+class TestMakerResponseModel(BaseModel):
     test_samples: List[TestSampleModel] = Field(default=[])
-    raw_model_response: str = Field(default="")
 
 
 class ProcessorResponseModel(BaseModel):

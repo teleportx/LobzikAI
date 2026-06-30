@@ -1,9 +1,7 @@
 import asyncio
-from aiohttp import ClientSession
 import base64
 
 from processor import LectureProcessor
-from processor.summarizer import AsyncTextSummarizer
 import time
 
 
@@ -13,19 +11,16 @@ def encode_audio_to_base64(audio_path):
 
 
 async def call_summarizer(file_name: str):
-    async with ClientSession() as session:
-        return await model(audio_base64=encode_audio_to_base64(file_name), session=session)
+    await model(audio_base64=encode_audio_to_base64(file_name))
 
 
 async def call_sum_sep(text: str):
-    async with ClientSession() as session:
-        return await su(text=text, session=session)
+    await model.summarizer(text=text)
 
 
 audio_file_path = "Обществознание.mp3"
 
 model = LectureProcessor()
-su = AsyncTextSummarizer()
 
 sample_text="""
 динаміка. Итак, социальная динамика общества. 
