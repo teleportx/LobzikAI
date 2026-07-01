@@ -11,11 +11,11 @@ def encode_audio_to_base64(audio_path):
 
 
 async def call_summarizer(file_name: str):
-    await model(audio_base64=encode_audio_to_base64(file_name))
+    return await model(audio_base64=encode_audio_to_base64(file_name))
 
 
 async def call_sum_sep(text: str):
-    await model.summarizer(text=text)
+    return await model.summarizer(text=text)
 
 
 audio_file_path = "Обществознание.mp3"
@@ -63,7 +63,7 @@ sample_text="""
 """
 start = time.time()
 # print(asyncio.run(call_summarizer(audio_file_path)))
-print(asyncio.run(call_sum_sep(text=sample_text)))
+print(asyncio.run(call_sum_sep(text=sample_text)).ai_response)
 end = time.time()
 
 print(f"Execution time {end - start}")

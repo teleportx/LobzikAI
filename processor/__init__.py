@@ -1,3 +1,5 @@
+import httpx
+
 from openai import AsyncOpenAI
 
 from .base import BaseProcessor
@@ -12,7 +14,20 @@ class LectureProcessor(BaseProcessor):
     def __init__(self):
         super().__init__()
 
-        self.client = AsyncOpenAI()
+        self.client = AsyncOpenAI(
+            http_client=httpx.AsyncClient(
+                trust_env=False,
+                timeout=httpx.Timeout(
+                    read=180,
+                    connect=10,
+                    pool=30,
+                    write=30,
+                ),
+                limits=httpx.Limits(
+                    max_connections=100,
+                )
+            )
+        )
 
         self.summarizer = AsyncTextSummarizer(client=self.client)
         self.asr = AsyncAudioTranscriber(client=self.client)
@@ -28,7 +43,8 @@ class LectureProcessor(BaseProcessor):
         if not extracted_text:
             if not audio_base64:
                 raise ValueError("No extracted text or audio provided")
-            extracted_text = await self.asr(audio_base64)
+            asr_result = await self.asr(audio_base64)
+            extracted_text = asr_result.text
 
         summarize_result = await self.summarizer(text=extracted_text)
 
@@ -40,4 +56,3 @@ class LectureProcessor(BaseProcessor):
             summarizer_response=summarize_result,
             test_maker_response=test_maker_result,
         )
-
