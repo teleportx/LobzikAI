@@ -2,7 +2,7 @@ from aiohttp import ClientSession
 
 from multi_thread_asr import MultiThreadSpeechToText
 
-from processor.asr import AsyncAudioTranscriber
+from processor import AsyncAudioTranscriber
 import config
 
 

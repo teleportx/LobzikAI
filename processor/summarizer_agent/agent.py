@@ -85,4 +85,5 @@ class SummarizerAgent:
                 raw_text=extracted_text,
             ),
             test_maker_response=result["generated_tests"],
+            messages_history=result["messages_history"],
         )

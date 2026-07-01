@@ -1,8 +1,8 @@
 from openai import AsyncOpenAI
 
-from .base import BaseProcessor
+from processor.base import BaseProcessor
 
-from .schemas import TestMakerResponseModel
+from processor.schemas import TestMakerResponseModel
 import config
 
 

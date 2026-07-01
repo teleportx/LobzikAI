@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List
 
 from pydantic import BaseModel, Field
 
@@ -28,3 +28,4 @@ class TestMakerResponseModel(BaseModel):
 class ProcessorResponseModel(BaseModel):
     summarizer_response: SummarizerResponseModel
     test_maker_response: TestMakerResponseModel | None
+    messages_history: list[dict[str, Any]]
