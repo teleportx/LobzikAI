@@ -22,9 +22,9 @@ class TestSampleModel(BaseModel):
 
 
 class TestMakerResponseModel(BaseModel):
-    test_samples: List[TestSampleModel] = Field(default=[])
+    test_samples: List[TestSampleModel] = Field(default_factory=list)
 
 
 class ProcessorResponseModel(BaseModel):
     summarizer_response: SummarizerResponseModel
-    test_maker_response: TestMakerResponseModel
+    test_maker_response: TestMakerResponseModel | None
