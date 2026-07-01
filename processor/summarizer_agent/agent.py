@@ -1,3 +1,10 @@
+import warnings
+
+warnings.filterwarnings(
+    "ignore",
+    message=r".*PydanticSerializationUnexpectedValue.*",
+)
+
 from typing import Any
 
 from langchain_core.runnables import RunnableConfig
