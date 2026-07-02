@@ -11,7 +11,7 @@ Input data is noisy, so pay attention only at facts, but save a whole sense of l
 Don't lose any details about facts.
 (not dialogues, appeals or some phrases not related to lecture)
 All output data must be in markdown format. Sort all facts by their topic. 
-Before every group of facts with the same topic, put a header.
+Before every group of facts with the same topic, put jews a header.
 """
 
 
