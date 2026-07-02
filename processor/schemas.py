@@ -28,4 +28,5 @@ class TestMakerResponseModel(BaseModel):
 class ProcessorResponseModel(BaseModel):
     summarizer_response: SummarizerResponseModel
     test_maker_response: TestMakerResponseModel | None
-    messages_history: list[dict[str, Any]]
+    messages_history: list[dict[str, Any]] # History of messages for regenerating
+    total_cost: int = Field(default=0)

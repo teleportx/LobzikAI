@@ -19,8 +19,9 @@ from .nodes import (
 )
 
 from .conditions import (
-    start_continue_condition,
+    generate_tests_condition,
     regenerate_tests_condition,
+    start_continue_condition,
 )
 
 from processor.schemas import ProcessorResponseModel, SummarizerResponseModel, SummarizerAIModel
@@ -41,7 +42,7 @@ class SummarizerAgent:
 
         graph.add_conditional_edges(START, start_continue_condition)
         graph.add_edge("summarize", "title_maker")
-        graph.add_edge("summarize", "generate_tests")
+        graph.add_conditional_edges("summarize", generate_tests_condition)
         graph.add_conditional_edges("regenerate", regenerate_tests_condition)
         graph.add_edge("title_maker", END)
         graph.add_edge("generate_tests", END)
@@ -58,6 +59,9 @@ class SummarizerAgent:
             regeneration_instructions: str = "",
     ) -> ProcessorResponseModel:
 
+        if messages_history is None:
+            messages_history = []
+
         state = AgentState(
             extracted_text=extracted_text,
             make_test=make_test,
@@ -68,7 +72,7 @@ class SummarizerAgent:
         )
         agent_config = RunnableConfig(
             run_name="assistant_graph",
-            tags=["brief_making", "DEBUG" if config.debug else "PROD"],
+            tags=["lecture_processor", "DEBUG" if config.debug else "PROD"],
             metadata={
                 "agent_version": "v0.0.0",
             },

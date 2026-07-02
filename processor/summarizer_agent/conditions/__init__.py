@@ -1,2 +1,3 @@
+from .generate_tests_condition import generate_tests_condition
 from .regenerate_tests_condition import regenerate_tests_condition
 from .start_continue_condition import start_continue_condition

@@ -21,7 +21,7 @@ async def call_sum_sep(text: str):
 
 
 async def call_agent_sum(text: str):
-    return await agent(extracted_text=text)
+    return await agent(extracted_text=text, make_test=True)
 
 audio_file_path = "Обществознание.mp3"
 
@@ -69,7 +69,9 @@ sample_text="""
 """
 start = time.time()
 # print(asyncio.run(call_summarizer(audio_file_path)))
-print(asyncio.run(call_agent_sum(text=sample_text)).summarizer_response.ai_response)
+result = asyncio.run(call_agent_sum(text=sample_text))
+print(result.summarizer_response.ai_response)
+print(result.test_maker_response)
 end = time.time()
 
 print(f"Execution time {end - start}")

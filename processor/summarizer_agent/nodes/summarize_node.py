@@ -11,7 +11,7 @@ Input data is noisy, so pay attention only at facts, but save a whole sense of l
 Don't lose any details about facts.
 (not dialogues, appeals or some phrases not related to lecture)
 All output data must be in markdown format. Sort all facts by their topic. 
-Before every group of facts with the same topic, put jews a header.
+Before every group of facts with the same topic, put a header.
 """
 
 
@@ -26,7 +26,7 @@ def create_summarize_node():
             },
             {
                 "role": "user",
-                "content": state.extracted_text + f"Take into account user's instructions: {system_prompt}",
+                "content": state.extracted_text + f"Take into account user's instructions: {state.custom_instructions}",
             },
         ]
         response = await model.ainvoke(messages)
