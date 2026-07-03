@@ -1,5 +1,6 @@
+from operator import add
 from pydantic import BaseModel, Field
-from typing import Any
+from typing import Annotated, Any
 
 from processor.schemas import TestMakerResponseModel
 
@@ -15,4 +16,4 @@ class AgentState(BaseModel):
     ai_response: str = ""
     generated_tests: TestMakerResponseModel = Field(default_factory=TestMakerResponseModel)
     title: str = ""
-    total_cost: int = 0
+    total_cost: Annotated[float, add] = 0

@@ -1,6 +1,7 @@
 from langchain_openai import ChatOpenAI
 
 from processor.summarizer_agent.state import AgentState
+from processor.summarizer_agent.utils import count_request_cost
 
 import config
 
@@ -38,6 +39,7 @@ def create_summarize_node():
         return {
             "ai_response": response.content,
             "messages_history": messages + [ai_message],
+            "total_cost": count_request_cost(response),
         }
 
     return summarizer_node

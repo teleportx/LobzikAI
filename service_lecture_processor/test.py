@@ -72,6 +72,7 @@ start = time.time()
 result = asyncio.run(call_agent_sum(text=sample_text))
 print(result.summarizer_response.ai_response)
 print(result.test_maker_response)
+print(result.total_cost)
 end = time.time()
 
 print(f"Execution time {end - start}")

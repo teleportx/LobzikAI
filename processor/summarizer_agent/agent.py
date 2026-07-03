@@ -91,4 +91,5 @@ class SummarizerAgent:
             ),
             test_maker_response=result["generated_tests"],
             messages_history=result["messages_history"],
+            total_cost=result["total_cost"],
         )

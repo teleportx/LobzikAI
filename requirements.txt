@@ -11,8 +11,11 @@ aiormq==6.9.0
 pydantic==2.11.7
 aiohttp==3.12.15
 PyJWT==2.10.1
+
+# ML reqs:
 openai==2.44.0
 httpx==0.28.1
 langchain-openai==1.3.3
 langgraph==1.2.7
 langchain-core==1.4.8
+langsmith==0.9.7

@@ -45,7 +45,7 @@ class AsyncAudioTranscriber(BaseProcessor):
         )
         return response.output_text
 
-    async def __call__(self, audio_base64: str) -> TextModel:
+    async def __call__(self, audio_base64: str) -> str:
         chunks_count = (len(audio_base64) + self.chunk_size - 1) // self.chunk_size
         results = []
 
@@ -59,4 +59,4 @@ class AsyncAudioTranscriber(BaseProcessor):
 
         result_string = " ".join(results)
 
-        return TextModel(text=result_string)
+        return result_string

@@ -28,8 +28,7 @@ class LectureProcessor(BaseProcessor):
         if not extracted_text:
             if not audio_base64:
                 raise ValueError("No extracted text or audio provided")
-            asr_result = await self.asr(audio_base64)
-            extracted_text = asr_result.text
+            extracted_text = await self.asr(audio_base64)
 
         summarize_result = await self.summarizer(text=extracted_text)
 

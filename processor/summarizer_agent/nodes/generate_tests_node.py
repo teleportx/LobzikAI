@@ -1,7 +1,8 @@
 from langchain_openai import ChatOpenAI
 
-from processor.summarizer_agent.state import AgentState
 from processor.schemas import TestMakerResponseModel
+from processor.summarizer_agent.state import AgentState
+from processor.summarizer_agent.utils import count_request_cost
 
 import config
 
@@ -16,7 +17,9 @@ Your response is 10 questions with corresponding answers.
 def create_generate_tests_node():
     model = ChatOpenAI(model=config.AIModels.base_gpt_model).with_structured_output(
         schema=TestMakerResponseModel,
+        include_raw=True,
     )
+
     async def generate_tests_node(state: AgentState):
         additional = f"""Additional valuable information:
         User wrote a commentary about whole generation (summary + tests). 
@@ -33,8 +36,11 @@ def create_generate_tests_node():
                 "content": state.ai_response + additional,
             },
         ]
-        response: TestMakerResponseModel = await model.ainvoke(messages)
+        response = await model.ainvoke(messages)
 
-        return {"generated_tests": response}
+        return {
+            "generated_tests": response["parsed"],
+            "total_cost": count_request_cost(response["raw"]),
+        }
 
     return generate_tests_node

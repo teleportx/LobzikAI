@@ -1,6 +1,7 @@
 from langchain_openai import ChatOpenAI
 
 from processor.summarizer_agent.state import AgentState
+from processor.summarizer_agent.utils import count_request_cost
 
 import config
 
@@ -29,6 +30,9 @@ def create_title_node():
         ]
         response = await model.ainvoke(messages)
 
-        return {"title": response.content}
+        return {
+            "title": response.content,
+            "total_cost": count_request_cost(response),
+        }
 
     return title_node
