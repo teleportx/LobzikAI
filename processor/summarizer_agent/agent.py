@@ -9,6 +9,7 @@ from typing import Any
 
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph, START, END
+from langsmith import Client
 
 from .state import AgentState
 from .nodes import (
@@ -31,7 +32,7 @@ import config
 
 class SummarizerAgent:
     def __init__(self):
-        super().__init__()
+        self.smith_client = Client()
 
         graph = StateGraph(AgentState)
 
