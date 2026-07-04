@@ -1,8 +1,10 @@
+from typing import Any
+
 from openai import AsyncOpenAI
 
 from processor.base import BaseProcessor
+from schemas import TeacherResponseModel
 
-from .schemas import TextModel
 import config
 
 
@@ -21,32 +23,29 @@ class AsyncTeacherModel(BaseProcessor):
             self,
             lecture_text: str,
             student_question: str,
-    ) -> TextModel:
-        messages = [
-            {
-                "role": "system",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": self.system_prompt,
-                    }
-                ]
-            },
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": f"Lecture: {lecture_text} \n Student's question: {student_question}"
-                    }
-                ]
-            }
-        ]
+            messages_history: list[dict[str, Any]] | None = None,
+    ) -> TeacherResponseModel:
+
+        new_message = {
+            "role": "user",
+            "content": f"Student's question: {student_question}",
+        }
+
+        if not messages_history:
+            messages_history = [
+                {
+                    "role": "system",
+                    "content": self.system_prompt + f"\nThe lecture: {lecture_text}",
+                },
+            ]
+        messages_history.append(new_message)
+
         response = await self.client.responses.parse(
             model=self.model,
-            input=messages,
+            input=messages_history,
         )
 
-        return TextModel(
+        return TeacherResponseModel(
             text=response.output_text,
+            messages_history=messages_history,
         )

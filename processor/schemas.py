@@ -1,6 +1,7 @@
 from typing import Any, List
 
 from pydantic import BaseModel, Field
+from urllib3.contrib.emscripten import fetch
 
 
 class TextModel(BaseModel):
@@ -30,3 +31,7 @@ class ProcessorResponseModel(BaseModel):
     test_maker_response: TestMakerResponseModel | None
     messages_history: list[dict[str, Any]] = Field(default_factory=list)# History of messages for regenerating
     total_cost: float = Field(default=0)
+
+
+class TeacherResponseModel(TextModel):
+    messages_history: list[dict[str, Any]] = Field(default_factory=list)# History of ask AI interaction (future feature)
