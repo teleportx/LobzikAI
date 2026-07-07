@@ -1,7 +1,6 @@
 from typing import Any, List
 
 from pydantic import BaseModel, Field
-from urllib3.contrib.emscripten import fetch
 
 
 class TextModel(BaseModel):
