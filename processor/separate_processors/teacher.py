@@ -3,7 +3,7 @@ from typing import Any
 from openai import AsyncOpenAI
 
 from processor.base import BaseProcessor
-from schemas import TeacherResponseModel
+from ..schemas import TeacherResponseModel
 
 import config
 

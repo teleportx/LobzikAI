@@ -8,7 +8,7 @@ from starlette.requests import Request
 from starlette.templating import Jinja2Templates
 
 import db
-from separate_processors.teacher import AsyncTeacherModel
+from processor.separate_processors.teacher import AsyncTeacherModel
 from utils.first_get import first_get
 from utils.jwt_token import AuthorizeDep
 
