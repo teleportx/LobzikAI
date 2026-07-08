@@ -21,7 +21,7 @@ class MultiThreadSpeechToText:
         self.saving_path = os.path.join(config.model_cache_dir, self.model_name)
 
         if not os.path.exists(self.saving_path):
-            logger.info('Vosk model doesn\'t exists. Start downloading...')
+            logger.info('Vosk model not loaded. Start downloading...')
             download_and_extract_zip(
                 url=f"https://alphacephei.com/vosk/models/{self.model_name}.zip",
                 save_dir=config.model_cache_dir,
@@ -60,7 +60,6 @@ class MultiThreadSpeechToText:
         return result_text.strip()
 
     async def __call__(self, audio_base64: str) -> str:
-        """Get text from audiofile, split into N chunks and process in parallel."""
         audio_file = base64.b64decode(audio_base64)
 
         wav_bytes = convert_audio_to_vosk_wav(audio_file)

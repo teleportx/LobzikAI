@@ -8,7 +8,6 @@ import json
 from datetime import datetime
 from loguru import logger
 
-from aiohttp import ClientSession
 from aiogram import Bot
 from sqlalchemy import insert
 from aiormq.abc import DeliveredMessage
@@ -21,12 +20,12 @@ import config
 import keyboards
 from utils.get_bot_api_session import get_bot_api_session
 
-from processor import LectureProcessor
+from processor.summarizer_agent import SummarizerAgent
 
 
 setup_logger.__init__('Service Lecture Processor')
 
-lecture_processor: LectureProcessor
+lecture_processor: SummarizerAgent
 
 bot = Bot(config.bot_token, default=DefaultBotProperties(parse_mode='html'), session=get_bot_api_session())
 
@@ -34,15 +33,10 @@ bot = Bot(config.bot_token, default=DefaultBotProperties(parse_mode='html'), ses
 async def on_message(message: DeliveredMessage):
     body = json.loads(message.body.decode())
 
-    async with ClientSession() as session:
-        result = await lecture_processor(
-            extracted_text=body["asr_result"],
-            session=session,
-            make_test=True,
-        )
-
-    if not result.test_maker_response.is_success:
-        logger.error(f"Failed to process TestMaker response: {result.test_maker_response.raw_model_response}")
+    result = await lecture_processor(
+        extracted_text=body["asr_result"],
+        make_test=True,
+    )
 
     async with db.base.Session() as session:
         show_questions_section = False
@@ -87,7 +81,7 @@ async def main():
     global lecture_processor
 
     db.base.start()
-    lecture_processor = LectureProcessor()
+    lecture_processor = SummarizerAgent()
 
     channel = await (await brocker.get_connection()).channel()
     await channel.basic_qos(prefetch_count=3)

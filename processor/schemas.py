@@ -1,14 +1,10 @@
-from typing import List
+from typing import Any, List
 
 from pydantic import BaseModel, Field
 
 
 class TextModel(BaseModel):
     text: str
-
-
-class IsSuccessModel(BaseModel):
-    is_success: bool = Field(default=True)
 
 
 class SummarizerAIModel(TextModel):
@@ -25,11 +21,16 @@ class TestSampleModel(BaseModel):
     answer: str
 
 
-class TestMakerResponseModel(IsSuccessModel):
-    test_samples: List[TestSampleModel] = Field(default=[])
-    raw_model_response: str = Field(default="")
+class TestMakerResponseModel(BaseModel):
+    test_samples: List[TestSampleModel] = Field(default_factory=list)
 
 
 class ProcessorResponseModel(BaseModel):
     summarizer_response: SummarizerResponseModel
-    test_maker_response: TestMakerResponseModel
+    test_maker_response: TestMakerResponseModel | None
+    messages_history: list[dict[str, Any]] = Field(default_factory=list)# History of messages for regenerating
+    total_cost: float = Field(default=0)
+
+
+class TeacherResponseModel(TextModel):
+    messages_history: list[dict[str, Any]] = Field(default_factory=list)# History of ask AI interaction (future feature)

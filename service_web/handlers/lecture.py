@@ -1,20 +1,22 @@
 import uuid
 
-import aiohttp
+from openai import AsyncOpenAI
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import select, update
 from starlette.requests import Request
 from starlette.templating import Jinja2Templates
-from watchfiles import awatch
 
 import db
-from processor import AsyncTeacherModel
+from separate_processors.teacher import AsyncTeacherModel
 from utils.first_get import first_get
 from utils.jwt_token import AuthorizeDep
 
 router = APIRouter(prefix='/lecture')
 templates = Jinja2Templates('templates')
+
+client = AsyncOpenAI()
+teacher_model = AsyncTeacherModel(client=client)
 
 
 class LectureEditModel(BaseModel):
@@ -25,12 +27,8 @@ class LectureAskModel(BaseModel):
     question: str = Field(max_length=1000)
 
 
-teacher_model = AsyncTeacherModel()
-
-
 async def call_teacher_model(summarized_text: str, question: str):
-    async with aiohttp.ClientSession() as session:
-        answer = await teacher_model(session, summarized_text, question)
+    answer = await teacher_model(summarized_text, question)
     return answer
 
 

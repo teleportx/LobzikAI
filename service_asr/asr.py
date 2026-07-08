@@ -1,28 +1,27 @@
-from aiohttp import ClientSession
+from openai import AsyncOpenAI
 
 from multi_thread_asr import MultiThreadSpeechToText
 
-from processor.asr import AsyncAudioTranscriber
+from processor.separate_processors import AsyncAudioTranscriber
 import config
 
 
 class ASRModel:
     def __init__(self):
+        self.client = AsyncOpenAI()
+
         if config.use_local_asr:
-            self.local_model = MultiThreadSpeechToText(
+            self.model = MultiThreadSpeechToText(
                 workers=config.Constants.num_asr_workers,
                 chunk_overlapping=config.Constants.chunk_overlapping,
             )
         else:
-            self.remote_model = AsyncAudioTranscriber(
+            self.model = AsyncAudioTranscriber(
                 chunk_size_mb=config.Constants.remote_asr_chunk_size_mb,
+                client=self.client,
             )
 
     async def __call__(self, audio_base64: str) -> str:
-        if not config.use_local_asr:
-            async with ClientSession() as session:
-                result = await self.remote_model(audio_base64=audio_base64, session=session)
-        else:
-            result = await self.local_model(audio_base64=audio_base64)
+        result = await self.model(audio_base64=audio_base64)
 
         return result

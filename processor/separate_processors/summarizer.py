@@ -1,13 +1,13 @@
-from aiohttp import ClientSession
+from openai import AsyncOpenAI
 
-from .base import BaseProcessor
-from .schemas import SummarizerResponseModel, SummarizerAIModel
+from processor.base import BaseProcessor
+from processor.schemas import SummarizerResponseModel, SummarizerAIModel
 
 import config
 
 
 class AsyncTextSummarizer(BaseProcessor):
-    def __init__(self):
+    def __init__(self, client: AsyncOpenAI):
         super().__init__()
         self.system_prompt = """You are an assistant who makes a brief of some lecture.
         You need to extract all facts from lecture. Your result - a list of facts.
@@ -21,11 +21,13 @@ class AsyncTextSummarizer(BaseProcessor):
         You are provided summarized version of some lecture. Your task - give a short title.
         Title must be shorter than 5 words, but represent main reason of lecture."""
 
+        self.client = client
+
         self.model = config.AIModels.sum_model
         self.title_maker_model = config.AIModels.base_gpt_model
 
-    def _format_request_body(self, lecture_text: str) -> dict:
-        messages = [
+    async def __call__(self, text: str) -> SummarizerResponseModel:
+        summarizer_messages = [
             {
                 "role": "system",
                 "content": [
@@ -40,20 +42,13 @@ class AsyncTextSummarizer(BaseProcessor):
                 "content": [
                     {
                         "type": "text",
-                        "text": f"Summarize this lecture: {lecture_text}"
+                        "text": f"Summarize this lecture: {text}",
                     }
                 ]
             }
         ]
-        return {
-            "model": self.model,
-            "messages": messages,
-            "max_tokens": len(lecture_text) // 4,
-            "temperature": 0,
-        }
 
-    def _format_title_maker_request_body(self, summarized_lecture_text: str) -> dict:
-        messages = [
+        title_maker_messages = [
             {
                 "role": "system",
                 "content": [
@@ -68,37 +63,26 @@ class AsyncTextSummarizer(BaseProcessor):
                 "content": [
                     {
                         "type": "text",
-                        "text": f"Give a title to lecture bellow: {summarized_lecture_text}"
+                        "text": f"Give a title to lecture bellow: {text}"
                     }
                 ]
             }
         ]
-        return {
-            "model": self.title_maker_model,
-            "messages": messages,
-            "max_tokens": 32,
-            "temperature": 0.5,
-        }
 
-    async def __call__(self, session: ClientSession, text: str) -> SummarizerResponseModel:
-        """Summarize the given text asynchronously"""
-        summarizer_request_body = self._format_request_body(lecture_text=text)
+        summarizer_response = await self.client.responses.parse(
+            model=self.model,
+            input=summarizer_messages,
+        )
 
-        async with session.post(self.url, headers=self.headers, json=summarizer_request_body) as response:
-            response.raise_for_status()
-            data = await response.json()
-            summarized_lecture = data["choices"][0]["message"]["content"]
-
-        title_maker_request_body = self._format_title_maker_request_body(summarized_lecture)
-
-        async with session.post(self.url, headers=self.headers, json=title_maker_request_body) as response:
-            response.raise_for_status()
-            data = await response.json()
-            title = data["choices"][0]["message"]["content"]
+        title_maker_response = await self.client.responses.parse(
+            model=self.title_maker_model,
+            input=title_maker_messages,
+            max_output_tokens=32,
+        )
 
         ai_response = SummarizerAIModel(
-            title=title,
-            text=summarized_lecture,
+            title=title_maker_response.output_text,
+            text=summarizer_response.output_text,
         )
 
         return SummarizerResponseModel(

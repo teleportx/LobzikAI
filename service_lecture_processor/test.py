@@ -1,10 +1,10 @@
 import asyncio
-from aiohttp import ClientSession
 import base64
-
-from processor import LectureProcessor
-from processor.summarizer import AsyncTextSummarizer
 import time
+
+from processor.separate_processors import LectureProcessor
+from processor.summarizer_agent import SummarizerAgent
+
 
 
 def encode_audio_to_base64(audio_path):
@@ -13,19 +13,20 @@ def encode_audio_to_base64(audio_path):
 
 
 async def call_summarizer(file_name: str):
-    async with ClientSession() as session:
-        return await model(audio_base64=encode_audio_to_base64(file_name), session=session)
+    return await model(audio_base64=encode_audio_to_base64(file_name))
 
 
 async def call_sum_sep(text: str):
-    async with ClientSession() as session:
-        return await su(text=text, session=session)
+    return await model.summarizer(text=text)
 
+
+async def call_agent_sum(text: str):
+    return await agent(extracted_text=text, make_test=True)
 
 audio_file_path = "Обществознание.mp3"
 
 model = LectureProcessor()
-su = AsyncTextSummarizer()
+agent = SummarizerAgent()
 
 sample_text="""
 динаміка. Итак, социальная динамика общества. 
@@ -68,7 +69,10 @@ sample_text="""
 """
 start = time.time()
 # print(asyncio.run(call_summarizer(audio_file_path)))
-print(asyncio.run(call_sum_sep(text=sample_text)))
+result = asyncio.run(call_agent_sum(text=sample_text))
+print(result.summarizer_response.ai_response)
+print(result.test_maker_response)
+print(result.total_cost)
 end = time.time()
 
 print(f"Execution time {end - start}")
