@@ -15,6 +15,7 @@ def create_title_node():
     model = ChatOpenAI(
         model=config.AIModels.base_gpt_model,
         max_completion_tokens=32,
+        reasoning_effort="low",
     )
 
     async def title_node(state: AgentState):

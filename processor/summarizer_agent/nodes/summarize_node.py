@@ -31,14 +31,9 @@ def create_summarize_node():
             },
         ]
         response = await model.ainvoke(messages)
-        ai_message = {
-            "role": "assistant",
-            "content": response.content,
-        }
 
         return {
             "ai_response": response.content,
-            "messages_history": messages + [ai_message],
             "total_cost": count_request_cost(response),
         }
 

@@ -28,7 +28,7 @@ class TestMakerResponseModel(BaseModel):
 class ProcessorResponseModel(BaseModel):
     summarizer_response: SummarizerResponseModel
     test_maker_response: TestMakerResponseModel | None
-    messages_history: list[dict[str, Any]] = Field(default_factory=list)# History of messages for regenerating
+    messages_history: list[dict[str, Any]] = Field(default_factory=list)
     total_cost: float = Field(default=0)
 
 

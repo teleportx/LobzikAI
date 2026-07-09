@@ -23,13 +23,13 @@ def create_generate_tests_node():
     async def generate_tests_node(state: AgentState):
         additional = f"""Additional valuable information:
         User wrote a commentary about whole generation (summary + tests). 
-        If you know that these instructions can affect test generation, 
-        take them into account: {state.custom_instructions}""" if state.custom_instructions else ""
+        If you know that these instructions can affect test generation, take them into account: 
+        {state.regeneration_instructions}""" if state.regeneration_instructions else ""
 
         messages = [
             {
                 "role": "system",
-                "content": system_prompt,
+                "content": system_prompt + f"custom user's instructions: {state.custom_instructions}",
             },
             {
                 "role": "user",

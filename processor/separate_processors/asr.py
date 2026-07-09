@@ -1,7 +1,6 @@
 from openai import AsyncOpenAI
 
 from processor.base import BaseProcessor
-from processor.schemas import TextModel
 
 import config
 
