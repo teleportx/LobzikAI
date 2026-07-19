@@ -4,7 +4,7 @@ from aiogram import BaseMiddleware, types
 from aiogram.types import Update, LinkPreviewOptions
 from sqlalchemy import select, insert, update
 
-import db
+from libs import db
 
 
 class AuthUserMiddleware(BaseMiddleware):

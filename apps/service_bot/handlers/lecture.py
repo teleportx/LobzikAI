@@ -2,8 +2,8 @@ from aiogram import Router, types, F
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import config
-import db
+from libs import config
+from libs import db
 import keyboards
 
 router = Router()

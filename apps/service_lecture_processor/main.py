@@ -13,14 +13,14 @@ from sqlalchemy import insert
 from aiormq.abc import DeliveredMessage
 from aiogram.client.default import DefaultBotProperties
 
-import brocker
-import setup_logger
-import db
-import config
+from libs import brocker
+from libs import setup_logger
+from libs import db
+from libs import config
 import keyboards
-from utils.get_bot_api_session import get_bot_api_session
+from libs.utils.get_bot_api_session import get_bot_api_session
 
-from processor.summarizer_agent import SummarizerAgent
+from libs.processor.summarizer_agent import SummarizerAgent
 
 
 setup_logger.__init__('Service Lecture Processor')

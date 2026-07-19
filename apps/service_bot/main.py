@@ -1,6 +1,5 @@
 import sys
 
-
 sys.path.append('.')
 sys.path.append('service_bot')
 
@@ -9,13 +8,13 @@ import asyncio
 from aiogram import Dispatcher, Bot
 from aiogram.client.default import DefaultBotProperties
 
-import db
-import config
+from libs import db
+from libs import config
 
-from utils.get_bot_api_session import get_bot_api_session
+from libs.utils.get_bot_api_session import get_bot_api_session
 import handlers
 import middlewares
-import setup_logger
+from libs import setup_logger
 
 
 setup_logger.__init__('Service bot')

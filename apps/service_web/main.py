@@ -1,7 +1,5 @@
 import sys
 
-from starlette.staticfiles import StaticFiles
-
 sys.path.append('.')
 sys.path.append('service_web')
 
@@ -9,10 +7,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.staticfiles import StaticFiles
 
-import db
+from libs import db
 import handlers
-import setup_logger
+from libs import setup_logger
 
 
 setup_logger.__init__('Service web')

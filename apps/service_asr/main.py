@@ -12,11 +12,11 @@ from loguru import logger
 from aiogram import Bot
 from aiormq.abc import DeliveredMessage
 
-import brocker
-import setup_logger
-import config
+from libs import brocker
+from libs import setup_logger
+from libs import config
 
-from utils.get_bot_api_session import get_bot_api_session
+from libs.utils.get_bot_api_session import get_bot_api_session
 
 from asr import ASRModel
 

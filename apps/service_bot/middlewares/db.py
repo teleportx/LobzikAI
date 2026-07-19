@@ -3,7 +3,7 @@ from typing import Any, Dict, Callable
 from aiogram import BaseMiddleware
 from aiogram.types import Update
 
-import db
+from libs import db
 
 
 class DatabaseMiddleware(BaseMiddleware):

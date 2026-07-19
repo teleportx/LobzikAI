@@ -2,8 +2,8 @@ from openai import AsyncOpenAI
 
 from multi_thread_asr import MultiThreadSpeechToText
 
-from processor.separate_processors import AsyncAudioTranscriber
-import config
+from libs.processor.separate_processors import AsyncAudioTranscriber
+from libs import config
 
 
 class ASRModel:

@@ -2,7 +2,7 @@ from aiogram import Router, types
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import db
+from libs import db
 import keyboards
 
 router = Router()

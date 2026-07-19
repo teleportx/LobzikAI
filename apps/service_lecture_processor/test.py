@@ -2,8 +2,8 @@ import asyncio
 import base64
 import time
 
-from processor.separate_processors import LectureProcessor
-from processor.summarizer_agent import SummarizerAgent
+from libs.processor.separate_processors import LectureProcessor
+from libs.processor.summarizer_agent import SummarizerAgent
 
 
 

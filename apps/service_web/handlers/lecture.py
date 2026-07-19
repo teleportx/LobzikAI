@@ -7,10 +7,10 @@ from sqlalchemy import select, update
 from starlette.requests import Request
 from starlette.templating import Jinja2Templates
 
-import db
-from processor.separate_processors.teacher import AsyncTeacherModel
-from utils.first_get import first_get
-from utils.jwt_token import AuthorizeDep
+from libs import db
+from libs.processor.separate_processors.teacher import AsyncTeacherModel
+from libs.utils.first_get import first_get
+from libs.utils.jwt_token import AuthorizeDep
 
 router = APIRouter(prefix='/lecture')
 templates = Jinja2Templates('templates')
