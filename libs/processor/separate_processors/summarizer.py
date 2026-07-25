@@ -1,13 +1,11 @@
 from openai import AsyncOpenAI
 
-from processor.base import BaseProcessor
-from processor.schemas import SummarizerResponseModel, SummarizerAIModel
-
-import config
+from ..base import BaseProcessor
+from ..schemas import SummarizerResponseModel, SummarizerAIModel
 
 
 class AsyncTextSummarizer(BaseProcessor):
-    def __init__(self, client: AsyncOpenAI):
+    def __init__(self, client: AsyncOpenAI, base_gpt_model: str, sum_model: str):
         super().__init__()
         self.system_prompt = """You are an assistant who makes a brief of some lecture.
         You need to extract all facts from lecture. Your result - a list of facts.
@@ -23,8 +21,8 @@ class AsyncTextSummarizer(BaseProcessor):
 
         self.client = client
 
-        self.model = config.AIModels.sum_model
-        self.title_maker_model = config.AIModels.base_gpt_model
+        self.model = sum_model
+        self.title_maker_model = base_gpt_model
 
     async def __call__(self, text: str) -> SummarizerResponseModel:
         summarizer_messages = [

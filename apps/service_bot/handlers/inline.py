@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from libs import db
-import keyboards.lecture
+from libs import keyboards
 
 router = Router()
 

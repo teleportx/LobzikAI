@@ -7,7 +7,7 @@ from sqlalchemy import select, update
 from starlette.requests import Request
 from starlette.templating import Jinja2Templates
 
-from libs import db
+from libs import db, config
 from libs.processor.separate_processors.teacher import AsyncTeacherModel
 from libs.utils.first_get import first_get
 from libs.utils.jwt_token import AuthorizeDep
@@ -16,7 +16,7 @@ router = APIRouter(prefix='/lecture')
 templates = Jinja2Templates('templates')
 
 client = AsyncOpenAI()
-teacher_model = AsyncTeacherModel(client=client)
+teacher_model = AsyncTeacherModel(client=client, base_gpt_model=config.AIModels.base_gpt_model)
 
 
 class LectureEditModel(BaseModel):

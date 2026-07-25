@@ -1,7 +1,7 @@
+import os.path
 import sys
 
-sys.path.append('.')
-sys.path.append('service_web')
+sys.path.append('..')
 
 from contextlib import asynccontextmanager
 
@@ -12,9 +12,10 @@ from starlette.staticfiles import StaticFiles
 from libs import db
 import handlers
 from libs import setup_logger
+from libs import config
 
 
-setup_logger.__init__('Service web')
+setup_logger.__init__('Service web', config.debug)
 
 
 class DatabaseMiddleware(BaseHTTPMiddleware):
@@ -32,7 +33,7 @@ class DatabaseMiddleware(BaseHTTPMiddleware):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    db.base.start()
+    db.base.start(config.db_url, config.debug, config.Constants.db_pool_max_size)
 
     yield
 
@@ -41,4 +42,4 @@ app = FastAPI(lifespan=lifespan)
 app.add_middleware(DatabaseMiddleware)
 app.include_router(handlers.router)
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")

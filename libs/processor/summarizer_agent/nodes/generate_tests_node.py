@@ -1,10 +1,8 @@
 from langchain_openai import ChatOpenAI
 
-from processor.schemas import TestMakerResponseModel
-from processor.summarizer_agent.state import AgentState
-from processor.summarizer_agent.utils import count_request_cost
-
-import config
+from ...schemas import TestMakerResponseModel
+from ...summarizer_agent.state import AgentState
+from ...summarizer_agent.utils import count_request_cost
 
 
 system_prompt = """AI agent wrote some summary (short facts) extracted from some lecture.
@@ -14,8 +12,8 @@ Your response is 10 questions with corresponding answers.
 """
 
 
-def create_generate_tests_node():
-    model = ChatOpenAI(model=config.AIModels.base_gpt_model).with_structured_output(
+def create_generate_tests_node(base_gpt_model: str):
+    model = ChatOpenAI(model=base_gpt_model).with_structured_output(
         schema=TestMakerResponseModel,
         include_raw=True,
     )

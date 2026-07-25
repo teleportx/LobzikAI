@@ -1,20 +1,19 @@
 from openai import AsyncOpenAI
 
-from processor.base import BaseProcessor
+from ..base import BaseProcessor
 
-from processor.schemas import TestMakerResponseModel
-import config
+from ..schemas import TestMakerResponseModel
 
 
 class AsyncTestMaker(BaseProcessor):
-    def __init__(self, client: AsyncOpenAI):
+    def __init__(self, client: AsyncOpenAI, base_gpt_model: str):
         super().__init__()
         self.system_prompt = """You are teacher. You've been provided some facts from lecture.
         Your task - Make a short test with growing complexity of questions. 
         Your response 10 questions with respective answers.
         """
 
-        self.model = config.AIModels.base_gpt_model
+        self.model = base_gpt_model
         self.client = client
 
     async def __call__(self, text: str) -> TestMakerResponseModel:

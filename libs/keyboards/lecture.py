@@ -4,8 +4,7 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-import config
-from utils import jwt_token
+from libs.utils import jwt_token
 
 
 class LectureMarkEditCallbackData(CallbackData, prefix='le'):
@@ -14,25 +13,33 @@ class LectureMarkEditCallbackData(CallbackData, prefix='le'):
     value: bool
 
 
-def get(lecture_id: uuid.UUID) -> InlineKeyboardMarkup:
+def get(lecture_id: uuid.UUID, host: str) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     builder.button(
         text='View lecture',
-        url=config.host + f'/lecture/{lecture_id}',
+        url=host + f'/lecture/{lecture_id}',
     )
 
     return builder.as_markup()
 
 
-def get_owned(lecture_id: uuid.UUID, user_id: int, show_questions_section: bool, show_askai_section: bool) -> InlineKeyboardMarkup:
+def get_owned(
+        lecture_id: uuid.UUID,
+        user_id: int,
+        show_questions_section: bool,
+        show_askai_section: bool,
+        host: str,
+        lecture_token_ttl: int,
+        jwt_secret: str,
+) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
-    jti, api_key = jwt_token.generate_token('lecture', {'user_id': user_id}, config.Constants.lecture_token_ttl)
+    jti, api_key = jwt_token.generate_token('lecture', {'user_id': user_id}, lecture_token_ttl, jwt_secret)
 
     builder.button(
         text='View/edit lecture',
-        url=config.host + f'/lecture/{lecture_id}?apikey={api_key}',
+        url=host + f'/lecture/{lecture_id}?apikey={api_key}',
     )
 
     mark = ['❌', '✅']

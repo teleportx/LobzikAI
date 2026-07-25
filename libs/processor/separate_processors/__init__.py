@@ -1,22 +1,22 @@
 from openai import AsyncOpenAI
 
-from processor.base import BaseProcessor
-from processor.separate_processors.summarizer import AsyncTextSummarizer
-from processor.separate_processors.asr import AsyncAudioTranscriber
-from processor.separate_processors.test_maker import AsyncTestMaker
+from ..base import BaseProcessor
+from ..separate_processors.summarizer import AsyncTextSummarizer
+from ..separate_processors.asr import AsyncAudioTranscriber
+from ..separate_processors.test_maker import AsyncTestMaker
 
-from processor.schemas import ProcessorResponseModel, TestMakerResponseModel
+from ..schemas import ProcessorResponseModel, TestMakerResponseModel
 
 
 class LectureProcessor(BaseProcessor):
-    def __init__(self):
+    def __init__(self, base_gpt_model: str, sum_model: str, asr_model: str):
         super().__init__()
 
         self.client = AsyncOpenAI()
 
-        self.summarizer = AsyncTextSummarizer(client=self.client)
-        self.asr = AsyncAudioTranscriber(client=self.client)
-        self.test_maker = AsyncTestMaker(client=self.client)
+        self.summarizer = AsyncTextSummarizer(self.client, base_gpt_model, sum_model)
+        self.asr = AsyncAudioTranscriber(self.client, asr_model)
+        self.test_maker = AsyncTestMaker(self.client, base_gpt_model)
 
     async def __call__(
             self,

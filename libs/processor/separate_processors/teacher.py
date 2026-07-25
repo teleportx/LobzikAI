@@ -2,21 +2,19 @@ from typing import Any
 
 from openai import AsyncOpenAI
 
-from processor.base import BaseProcessor
+from ..base import BaseProcessor
 from ..schemas import TeacherResponseModel
-
-import config
 
 
 class AsyncTeacherModel(BaseProcessor):
-    def __init__(self, client: AsyncOpenAI):
+    def __init__(self, client: AsyncOpenAI, base_gpt_model: str):
         super().__init__()
         self.system_prompt = """You are teacher. You've been provided some facts from lecture.
         Some student asks question about the lecture. Your task - give him correct answer.
         If lecture doesn't contain any information about student's question - use your own knowledge.
         """
 
-        self.model = config.AIModels.base_gpt_model
+        self.model = base_gpt_model
         self.client = client
 
     async def __call__(

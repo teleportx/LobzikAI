@@ -17,7 +17,7 @@ from libs import brocker
 from libs import setup_logger
 from libs import db
 from libs import config
-import keyboards
+from libs import keyboards
 from libs.utils.get_bot_api_session import get_bot_api_session
 
 from libs.processor.summarizer_agent import SummarizerAgent
@@ -27,7 +27,7 @@ setup_logger.__init__('Service Lecture Processor')
 
 lecture_processor: SummarizerAgent
 
-bot = Bot(config.bot_token, default=DefaultBotProperties(parse_mode='html'), session=get_bot_api_session())
+bot = Bot(config.bot_token, default=DefaultBotProperties(parse_mode='html'), session=get_bot_api_session(config.telegram_bot_api_server))
 
 
 async def on_message(message: DeliveredMessage):
@@ -71,7 +71,8 @@ async def on_message(message: DeliveredMessage):
         body['owner_id'],
         f'Your lecture <b>{result.summarizer_response.ai_response.title}</b> is ready!\n'
         f'<i>~ {formatted_datetime}</i>',
-        reply_markup=keyboards.lecture.get_owned(lecture_id, body['owner_id'], show_questions_section, show_askai_section),
+        reply_markup=keyboards.lecture.get_owned(lecture_id, body['owner_id'], show_questions_section, show_askai_section,
+                                                 config.host, config.Constants.lecture_token_ttl, config.jwt_secret),
     )
 
     await message.channel.basic_ack(message.delivery_tag)  # set message is proceed
@@ -80,8 +81,8 @@ async def on_message(message: DeliveredMessage):
 async def main():
     global lecture_processor
 
-    db.base.start()
-    lecture_processor = SummarizerAgent()
+    db.base.start(config.db_url, config.debug, config.Constants.db_pool_max_size)
+    lecture_processor = SummarizerAgent(config.AIModels.base_gpt_model, config.AIModels.sum_model, config.AIModels.asr_model)
 
     channel = await (await brocker.get_connection()).channel()
     await channel.basic_qos(prefetch_count=3)

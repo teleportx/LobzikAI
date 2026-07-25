@@ -21,11 +21,11 @@ setup_logger.__init__('Service bot')
 
 dp = Dispatcher()
 
-bot = Bot(config.bot_token, default=DefaultBotProperties(parse_mode='html'), session=get_bot_api_session())
+bot = Bot(config.bot_token, default=DefaultBotProperties(parse_mode='html'), session=get_bot_api_session(config.telegram_bot_api_server))
 
 
 async def start_polling():
-    db.base.start()
+    db.base.start(config.db_url, config.debug, config.Constants.db_pool_max_size)
 
     await dp.start_polling(bot)
 

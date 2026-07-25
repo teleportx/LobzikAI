@@ -25,17 +25,15 @@ from .conditions import (
     start_continue_condition,
 )
 
-from processor.schemas import ProcessorResponseModel, SummarizerAIModel, SummarizerResponseModel
-
-import config
+from ..schemas import ProcessorResponseModel, SummarizerAIModel, SummarizerResponseModel
 
 
 class SummarizerAgent:
-    def __init__(self):
+    def __init__(self, base_gpt_model: str, sum_model: str, debug: bool):
         self.smith_client = Client()
         self.agent_config = RunnableConfig(
             run_name="assistant_graph",
-            tags=["lecture_processor", "DEBUG" if config.debug else "PROD"],
+            tags=["lecture_processor", "DEBUG" if debug else "PROD"],
             metadata={
                 "agent_version": "v0.0.0",
             },
@@ -43,10 +41,10 @@ class SummarizerAgent:
 
         graph = StateGraph(AgentState)
 
-        graph.add_node("generate_tests", create_generate_tests_node())
-        graph.add_node("regenerate", create_regenerate_node())
-        graph.add_node("summarize", create_summarize_node())
-        graph.add_node("title_maker", create_title_node())
+        graph.add_node("generate_tests", create_generate_tests_node(base_gpt_model))
+        graph.add_node("regenerate", create_regenerate_node(base_gpt_model))
+        graph.add_node("summarize", create_summarize_node(sum_model))
+        graph.add_node("title_maker", create_title_node(base_gpt_model))
 
         graph.add_conditional_edges(START, start_continue_condition)
         graph.add_edge("summarize", "title_maker")

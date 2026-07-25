@@ -8,11 +8,11 @@ from typing import Optional
 import click
 from openai import AsyncOpenAI
 
-from processor.separate_processors.summarizer import AsyncTextSummarizer
-from processor.separate_processors.test_maker import AsyncTestMaker
-from processor.separate_processors.asr import AsyncAudioTranscriber
-from processor.schemas import ProcessorResponseModel
-from processor.summarizer_agent.agent import SummarizerAgent
+from .separate_processors.summarizer import AsyncTextSummarizer
+from .separate_processors.test_maker import AsyncTestMaker
+from .separate_processors.asr import AsyncAudioTranscriber
+from .schemas import ProcessorResponseModel
+from .summarizer_agent.agent import SummarizerAgent
 import base64
 
 if sys.platform == "win32":

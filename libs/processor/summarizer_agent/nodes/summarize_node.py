@@ -1,9 +1,7 @@
 from langchain_openai import ChatOpenAI
 
-from processor.summarizer_agent.state import AgentState
-from processor.summarizer_agent.utils import count_request_cost
-
-import config
+from ...summarizer_agent.state import AgentState
+from ...summarizer_agent.utils import count_request_cost
 
 
 system_prompt = """You are an assistant who makes a brief of some lecture.
@@ -16,8 +14,8 @@ Before every group of facts with the same topic, put a header.
 """
 
 
-def create_summarize_node():
-    model = ChatOpenAI(model=config.AIModels.sum_model)
+def create_summarize_node(sum_model: str):
+    model = ChatOpenAI(model=sum_model)
 
     async def summarizer_node(state: AgentState):
         messages = [

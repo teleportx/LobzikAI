@@ -1,6 +1,6 @@
 from langgraph.graph import END
 
-from processor.summarizer_agent.state import AgentState
+from ...summarizer_agent.state import AgentState
 
 
 def generate_tests_condition(state: AgentState):

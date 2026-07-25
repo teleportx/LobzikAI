@@ -3,7 +3,7 @@ from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from libs import db
-import keyboards
+from libs import keyboards
 
 router = Router()
 

@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from libs import config
 from libs import db
-import keyboards
+from libs import keyboards
 
 router = Router()
 

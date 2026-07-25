@@ -1,9 +1,7 @@
 from langchain_openai import ChatOpenAI
 
-from processor.summarizer_agent.state import AgentState
-from processor.summarizer_agent.utils import count_request_cost
-
-import config
+from ...summarizer_agent.state import AgentState
+from ...summarizer_agent.utils import count_request_cost
 
 
 system_prompt = """Assistant generated a brief of lecture containing much noise and
@@ -11,8 +9,8 @@ other information not related to the lecture due to OCR defects.
 Your task is to fix the brief considering all instructions you will be given."""
 
 
-def create_regenerate_node():
-    model = ChatOpenAI(model=config.AIModels.base_gpt_model)
+def create_regenerate_node(base_gpt_model: str):
+    model = ChatOpenAI(model=base_gpt_model)
 
     async def regenerate_node(state: AgentState):
         messages = state.messages_history.copy()

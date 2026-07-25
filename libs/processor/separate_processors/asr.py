@@ -1,14 +1,12 @@
 from openai import AsyncOpenAI
 
-from processor.base import BaseProcessor
-
-import config
+from ..base import BaseProcessor
 
 
 class AsyncAudioTranscriber(BaseProcessor):
-    def __init__(self, client: AsyncOpenAI, chunk_size_mb: int = 4):
+    def __init__(self, client: AsyncOpenAI, asr_model: str, chunk_size_mb: int = 4):
         super().__init__()
-        self.model = config.AIModels.asr_model
+        self.model = asr_model
         self.chunk_size = chunk_size_mb * 1024 * 1024
         self.client = client
 

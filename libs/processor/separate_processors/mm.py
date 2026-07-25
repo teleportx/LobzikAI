@@ -1,13 +1,12 @@
 from openai import AsyncOpenAI
 
-from processor.base import BaseProcessor
+from ..base import BaseProcessor
 
-from processor.schemas import SummarizerResponseModel
-import config
+from ..schemas import SummarizerResponseModel
 
 
 class MultiModalProcessor(BaseProcessor):
-    def __init__(self, client: AsyncOpenAI):
+    def __init__(self, client: AsyncOpenAI, mm_model: str):
         super().__init__()
 
         self.system_prompt = """You are an assistant who makes a brief of some lecture.
@@ -17,7 +16,7 @@ class MultiModalProcessor(BaseProcessor):
         (not dialogues, appeals or some phrases not related to lecture)
         """
 
-        self.model = config.AIModels.mm_model
+        self.model = mm_model
         self.client = client
 
     async def __call__(self, audio_base64: str):

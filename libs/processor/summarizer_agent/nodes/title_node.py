@@ -1,9 +1,7 @@
 from langchain_openai import ChatOpenAI
 
-from processor.summarizer_agent.state import AgentState
-from processor.summarizer_agent.utils import count_request_cost
-
-import config
+from ...summarizer_agent.state import AgentState
+from ...summarizer_agent.utils import count_request_cost
 
 
 system_prompt = """You are an assistant who makes titles.
@@ -11,9 +9,9 @@ You are provided summarized version of some lecture. Your task - give a short ti
 Title must be shorter than 5 words, but represent main reason of lecture."""
 
 
-def create_title_node():
+def create_title_node(base_gpt_model: str):
     model = ChatOpenAI(
-        model=config.AIModels.base_gpt_model,
+        model=base_gpt_model,
         max_completion_tokens=32,
         reasoning_effort="low",
     )

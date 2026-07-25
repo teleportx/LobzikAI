@@ -2,7 +2,7 @@ from operator import add
 from pydantic import BaseModel, Field
 from typing import Annotated, Any
 
-from processor.schemas import TestMakerResponseModel
+from ..schemas import TestMakerResponseModel
 
 
 class AgentState(BaseModel):

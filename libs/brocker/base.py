@@ -3,7 +3,7 @@ from typing import Optional
 import aiormq
 from aiormq.abc import AbstractConnection, AbstractChannel
 
-import config
+from libs import config
 
 
 class ConnectionStorer:

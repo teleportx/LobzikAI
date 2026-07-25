@@ -3,11 +3,9 @@ import logging
 import os
 import platform
 import sys
-from pathlib import Path
 
 from loguru import logger
 
-import config
 
 project_name: str
 
@@ -33,7 +31,7 @@ class InterceptHandler(logging.Handler):
         logger.opt(exception=record.exc_info).log(level, record.getMessage())
 
 
-def __init__(__project_name: str):
+def __init__(__project_name: str, debug: bool = False):
     global project_name
 
     project_name = __project_name
@@ -42,13 +40,13 @@ def __init__(__project_name: str):
     logger.remove()
 
     logger_level = 'INFO'
-    if config.debug:
+    if debug:
         logger_level = 'DEBUG'
 
     logger.add(sys.stderr, level=logger_level)
 
     logger.info(f'LobzikAI | {project_name}')
-    if config.debug:
+    if debug:
         logger.warning('APP IN DEBUG MODE')
 
     logger.info(f"Python version: {platform.python_version()}")
