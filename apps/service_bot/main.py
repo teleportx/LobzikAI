@@ -15,11 +15,12 @@ from libs.utils.get_bot_api_session import get_bot_api_session
 import handlers
 import middlewares
 from libs import setup_logger
+from libs import redis_storage
 
 
 setup_logger.__init__('Service bot')
 
-dp = Dispatcher()
+dp = Dispatcher(storage=redis_storage.storage)
 
 bot = Bot(config.bot_token, default=DefaultBotProperties(parse_mode='html'), session=get_bot_api_session(config.telegram_bot_api_server))
 
