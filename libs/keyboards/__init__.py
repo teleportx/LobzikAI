@@ -1,1 +1,1 @@
-from . import lecture
+from . import lecture, audio
