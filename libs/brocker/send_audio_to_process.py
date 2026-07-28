@@ -4,12 +4,12 @@ from datetime import datetime
 from . import base
 
 
-async def send_audio_to_process(owner_id: int, file_id: str):
+async def send_audio_to_process(owner_id: int, *file_ids: list[str]):
     channel = await base.storer.get_channel()
 
     body = json.dumps({
         'owner_id': owner_id,
-        'file_id': file_id,
+        'file_id': file_ids[0], # TODO: joint processing
         'created_at': str(datetime.now().astimezone()),
         'callback_topic': 'lecture_process',
 
