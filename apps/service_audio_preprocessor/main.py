@@ -46,7 +46,6 @@ async def on_message(message: DeliveredMessage):
     logger.info(f'Start processing {files_hash}')
 
     file_url = await process_files(body.file_ids)
-    print(file_url)
     next_body = json.dumps({
         'owner_id': body.owner_id,
         'created_at': str(datetime.now().astimezone()),
