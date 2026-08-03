@@ -11,7 +11,7 @@ from libs import config
 from libs.utils.get_bot_api_session import get_bot_api_session
 
 sample_rate = 16000
-codec = "pcm_s24le"  # 24 bits PCM
+codec = "pcm_s16le"
 
 bot = Bot(config.bot_token, session=get_bot_api_session(config.telegram_bot_api_server))
 s3_session = aioboto3.Session(config.S3.access_key, config.S3.secret_key)
