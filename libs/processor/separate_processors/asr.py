@@ -42,7 +42,9 @@ class AsyncAudioTranscriber(BaseProcessor):
         )
         return response.output_text
 
-    async def __call__(self, audio_base64: str) -> str:
+    async def __call__(self, audio_file: bytes) -> str:
+        raise NotImplemented  # Input not in base64 format
+
         chunks_count = (len(audio_base64) + self.chunk_size - 1) // self.chunk_size
         results = []
 

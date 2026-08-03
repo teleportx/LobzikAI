@@ -1,66 +1,98 @@
+import hashlib
 import sys
 
-sys.path.append('.')
-sys.path.append('service_asr')
+import aiofiles
+from aiogram.client.session import aiohttp
+
+sys.path.append('..')
 
 import asyncio
 import json
-import base64
-import io
+from datetime import datetime
 from loguru import logger
 
+from pydantic import BaseModel, ValidationError
 from aiogram import Bot
 from aiormq.abc import DeliveredMessage
 
-from libs import brocker
 from libs import setup_logger
 from libs import config
-
+from libs.brocker import BrokerConnectionManager
 from libs.utils.get_bot_api_session import get_bot_api_session
-
 from asr import ASRModel
 
 
 setup_logger.__init__('Service ASR')
 
 bot = Bot(config.bot_token, session=get_bot_api_session(config.telegram_bot_api_server))
+s3_session: aiohttp.ClientSession
 model = ASRModel()
 
 
+class ASRModel(BaseModel):
+    owner_id: int
+    created_at: datetime
+    audio_link: str
+
+
 async def on_message(message: DeliveredMessage):
-    body = json.loads(message.body.decode())
-    logger.info(f'Start ASR for {body['file_id']}')
+    try:
+        body = ASRModel.model_validate_json(message.body)
 
-    callback_topic = body['callback_topic']
-    body.pop('callback_topic')
+    except ValidationError as e:
+        logger.warning(f'Invalid message received: {message.body.decode()}\n{e}')
+        await message.channel.basic_reject(message.delivery_tag, requeue=False)
+        return
 
-    file = io.BytesIO()
-    await bot.download(body['file_id'], file)
-    encoded_file = base64.b64encode(file.read()).decode()
+    async with s3_session.get(body.audio_link) as res:
+        audio_data = await res.content.read()
 
-    result = await model(audio_base64=encoded_file)
+    audio_hash = hashlib.sha256(audio_data).hexdigest()[:8]
+    logger.info(f'Start processing {audio_hash}')
+    result = await model(audio_data)
 
-    body['asr_result'] = result
-    callback_body = json.dumps(body, separators=(',', ':')).encode()
+    next_body = json.dumps({
+        'owner_id': body.owner_id,
+        'created_at': str(datetime.now().astimezone()),
+        'asr_result': result,
 
-    channel = await brocker.base.storer.get_channel()
-    await channel.basic_publish(callback_body, routing_key=callback_topic)
+    }, separators=(',', ':')).encode()
 
-    await message.channel.basic_ack(message.delivery_tag)  # set message is proceed
+    await message.channel.basic_publish(
+        next_body,
+        routing_key='lecture_processor'
+    )
+
+    await message.channel.basic_ack(message.delivery_tag)
+    logger.info(f'Finish processing {audio_hash}')
+
+
+async def consume_loop(connection_manager: BrokerConnectionManager):
+    while True:
+        try:
+            async with connection_manager.acquire_channel() as channel:
+                await channel.basic_qos(prefetch_count=1)
+
+                queue = await channel.queue_declare(
+                    'asr',
+                    durable=True,
+                )
+
+                await channel.basic_consume(queue.queue, on_message)
+                logger.info('Consumer started')
+                await asyncio.Future()
+
+        except Exception as e:
+            logger.exception('Consumer crashed, restarting...')
+            await asyncio.sleep(3)
 
 
 async def main():
-    channel = await (await brocker.get_connection()).channel()
-    await channel.basic_qos(prefetch_count=1)
+    global s3_session
+    s3_session = aiohttp.ClientSession()
 
-    declare = await channel.queue_declare('asr', durable=True)
-    logger.info('Start listen queue')
-    await channel.basic_consume(
-        declare.queue, on_message
-    )
-
+    connection_manager = BrokerConnectionManager(config.amqp_url, pool_size=4)
+    await consume_loop(connection_manager)
 
 if __name__ == '__main__':
-    loop = asyncio.new_event_loop()
-    loop.create_task(main())
-    loop.run_forever()
+    asyncio.run(main())

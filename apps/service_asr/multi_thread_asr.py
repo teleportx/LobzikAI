@@ -59,12 +59,8 @@ class MultiThreadSpeechToText:
             result_text += final_result.get("text", "")
         return result_text.strip()
 
-    async def __call__(self, audio_base64: str) -> str:
-        audio_file = base64.b64decode(audio_base64)
-
-        wav_bytes = convert_audio_to_vosk_wav(audio_file)
-
-        with wave.open(io.BytesIO(wav_bytes), 'rb') as wf:
+    async def __call__(self, audio_file: bytes) -> str:
+        with wave.open(io.BytesIO(audio_file), 'rb') as wf:
             framerate = wf.getframerate()
             total_frames = wf.getnframes()
             chunk_size = total_frames // self.workers
@@ -85,7 +81,7 @@ class MultiThreadSpeechToText:
                 asyncio.get_event_loop().run_in_executor(
                     executor,
                     self._process_chunk,
-                    wav_bytes, start, end, framerate
+                    audio_file, start, end, framerate
                 )
                 for start, end in chunks
             ]

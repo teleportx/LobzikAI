@@ -21,7 +21,7 @@ class ASRModel:
                 client=self.client,
             )
 
-    async def __call__(self, audio_base64: str) -> str:
-        result = await self.model(audio_base64=audio_base64)
+    async def __call__(self, audio_file: bytes) -> str:
+        result = await self.model(audio_file=audio_file)
 
         return result
