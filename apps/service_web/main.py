@@ -15,7 +15,7 @@ from libs import setup_logger
 from libs import config
 
 
-setup_logger.__init__('Service web', config.debug)
+setup_logger.__init__('Service web')
 
 
 class DatabaseMiddleware(BaseHTTPMiddleware):
