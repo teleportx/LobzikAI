@@ -3,6 +3,7 @@ import logging
 import os
 import platform
 import sys
+from os import environ
 
 from loguru import logger
 
@@ -31,9 +32,10 @@ class InterceptHandler(logging.Handler):
         logger.opt(exception=record.exc_info).log(level, record.getMessage())
 
 
-def __init__(__project_name: str, debug: bool = False):
+def __init__(__project_name: str):
     global project_name
 
+    debug = environ.get('DEBUG') == 'TRUE'
     project_name = __project_name
 
     logging.basicConfig(handlers=[InterceptHandler()], level=0)

@@ -1,3 +1,4 @@
+import hashlib
 import sys
 
 sys.path.append('..')
@@ -25,6 +26,13 @@ class AudioPreprocessModel(BaseModel):
     created_at: datetime
 
 
+def calc_list_str_hash(data: list[str]) -> str:
+    hash_builder = hashlib.sha256()
+    for el in data:
+        hash_builder.update(el.encode())
+    return hash_builder.hexdigest()
+
+
 async def on_message(message: DeliveredMessage):
     try:
         body = AudioPreprocessModel.model_validate_json(message.body)
@@ -34,11 +42,15 @@ async def on_message(message: DeliveredMessage):
         await message.channel.basic_reject(message.delivery_tag, requeue=False)
         return
 
-    result_file = await process_files(body.file_ids)
+    files_hash = calc_list_str_hash(body.file_ids)
+    logger.info(f'Start processing {files_hash}')
+
+    file_url = await process_files(body.file_ids)
+    print(file_url)
     next_body = json.dumps({
         'owner_id': body.owner_id,
         'created_at': str(datetime.now().astimezone()),
-        'audio': base64.b64encode(result_file).decode(),
+        'audio_link': file_url,
 
     }, separators=(',', ':')).encode()
 
@@ -48,7 +60,7 @@ async def on_message(message: DeliveredMessage):
     )
 
     await message.channel.basic_ack(message.delivery_tag)
-    logger.info(f'Files {body.file_ids} processed')
+    logger.info(f'Finish processing {files_hash}')
 
 
 async def consume_loop(connection_manager: BrokerConnectionManager):

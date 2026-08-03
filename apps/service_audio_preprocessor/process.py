@@ -2,6 +2,7 @@ import asyncio
 import uuid
 from pathlib import Path
 
+import aioboto3
 from aiofiles import tempfile
 from aiogram import Bot
 from loguru import logger
@@ -13,6 +14,7 @@ sample_rate = 16000
 codec = "pcm_s24le"  # 24 bits PCM
 
 bot = Bot(config.bot_token, session=get_bot_api_session(config.telegram_bot_api_server))
+s3_session = aioboto3.Session(config.S3.access_key, config.S3.secret_key)
 
 
 def build_filter_complex(n: int) -> str:
@@ -29,7 +31,31 @@ def build_filter_complex(n: int) -> str:
     return ';'.join(parts) + ';' + concat_part
 
 
-async def process_files(file_ids: list[str]) -> bytes:
+async def upload_to_s3(
+        data: bytes,
+        content_type: str,
+) -> str:
+
+    full_key = f'asr/{uuid.uuid4()}.wav'
+
+    async with s3_session.client('s3', use_ssl=config.S3.use_ssl, endpoint_url=config.S3.endpoint) as s3:
+        await s3.put_object(
+            Bucket=config.S3.bucket,
+            Key=full_key,
+            Body=data,
+            ContentType=content_type,
+        )
+        url = await s3.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': config.S3.bucket, 'Key': full_key},
+            ExpiresIn=60 * 60 * 24,
+        )
+
+    logger.debug("Uploaded %d bytes -> s3://%s/%s", len(data), config.S3.bucket, full_key)
+    return url
+
+
+async def process_files(file_ids: list[str]) -> str:
     infile_names = [uuid.uuid4() for _ in file_ids]
     logger.debug(f'Start processing {file_ids}')
 
@@ -70,4 +96,4 @@ async def process_files(file_ids: list[str]) -> bytes:
         if proc.returncode != 0:
             raise RuntimeError(f'Error while working with ffmpeg: {stderr.decode()}')
 
-    return stdout
+    return await upload_to_s3(stdout, 'audio/wav')
