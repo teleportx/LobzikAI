@@ -1,5 +1,6 @@
 from . import base
 
+from .base import BrokerConnectionManager
 from .send_audio_to_process import send_audio_to_process
 
 
