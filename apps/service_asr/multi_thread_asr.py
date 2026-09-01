@@ -10,7 +10,6 @@ from loguru import logger
 from vosk import Model, KaldiRecognizer
 
 from libs.utils.download_and_extract_zip import download_and_extract_zip
-from libs.utils.convert_audio_to_vosk_wav import convert_audio_to_vosk_wav
 
 from libs import config
 

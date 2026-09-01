@@ -16,6 +16,7 @@ class ASRModel:
                 chunk_overlapping=config.Constants.chunk_overlapping,
             )
         else:
+            raise NotImplemented
             self.model = AsyncAudioTranscriber(
                 chunk_size_mb=config.Constants.remote_asr_chunk_size_mb,
                 client=self.client,

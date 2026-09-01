@@ -60,7 +60,7 @@ async def on_message(message: DeliveredMessage):
 
     await message.channel.basic_publish(
         next_body,
-        routing_key='lecture_processor'
+        routing_key='lecture_process'
     )
 
     await message.channel.basic_ack(message.delivery_tag)
