@@ -33,11 +33,11 @@ class AIModels:
     mm_model = environ.get("MM_MODEL", "gemini-2.5-flash")
     local_asr_vosk_model = environ.get("LOCAL_ASR_VOSK_MODEL", "vosk-model-ru-0.22")
     base_gpt_model = environ.get("BASE_GPT_MODEL", "gpt-5-nano")
-
-
-class S3:
-    endpoint = environ['S3_ENDPOINT']
-    bucket = environ['S3_BUCKET']
-    use_ssl = environ.get('S3_SSL') != 'FALSE'
-    access_key = environ['S3_ACCESS_KEY']
-    secret_key = environ['S3_SECRET_KEY']
+#
+#
+# class S3:
+#     endpoint = environ['S3_ENDPOINT']
+#     bucket = environ['S3_BUCKET']
+#     use_ssl = environ.get('S3_SSL') != 'FALSE'
+#     access_key = environ['S3_ACCESS_KEY']
+#     secret_key = environ['S3_SECRET_KEY']

@@ -4,19 +4,18 @@ sys.path.append('.')
 sys.path.append('service_asr')
 
 import asyncio
-import base64
 
 from multi_thread_asr import MultiThreadSpeechToText
 
 
-def encode_audio_to_base64():
+def read_audio():
     with open(audio_path, "rb") as audio_file:
-        return base64.b64encode(audio_file.read()).decode('utf-8')
+        return audio_file.read()
 
 
-audio_path = "Обществознание.mp3"
+audio_path = "Обществознание.wav"
 
-model = MultiThreadSpeechToText(workers=8, chunk_overlapping=2.0)
-encoded_audio = encode_audio_to_base64()
-result = asyncio.run(model(audio_base64=encoded_audio))
+model = MultiThreadSpeechToText(workers=8, chunk_overlapping=2.0, use_gpu=True)
+encoded_audio = read_audio()
+result = asyncio.run(model(encoded_audio))
 print(result)
