@@ -10,7 +10,7 @@ COPY apps/asr/requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
 COPY libs/setup_logger libs/setup_logger
-COPY libs/config libs/config
+COPY libs/config.py libs/config.py
 COPY libs/brocker libs/brocker
 COPY libs/processor libs/processor
 
