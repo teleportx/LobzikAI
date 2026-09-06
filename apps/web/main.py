@@ -1,9 +1,9 @@
-import os.path
 import sys
 
 sys.path.append('..')
 
 from contextlib import asynccontextmanager
+import os.path
 
 from fastapi import FastAPI
 from starlette.middleware.base import BaseHTTPMiddleware

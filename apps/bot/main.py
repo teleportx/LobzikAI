@@ -1,7 +1,6 @@
 import sys
 
-sys.path.append('.')
-sys.path.append('service_bot')
+sys.path.append('..')
 
 import asyncio
 

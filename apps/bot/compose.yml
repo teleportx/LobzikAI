@@ -1,0 +1,10 @@
+name: lobzikai
+
+services:
+  bot:
+    build:
+      context: ../..
+      dockerfile: apps/bot/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ../../.env

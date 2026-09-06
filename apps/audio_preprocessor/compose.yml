@@ -1,0 +1,10 @@
+name: lobzikai
+
+services:
+  audio_preprocessor:
+    build:
+      context: ../..
+      dockerfile: apps/audio_preprocessor/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ../../.env

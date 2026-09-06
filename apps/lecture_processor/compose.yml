@@ -1,0 +1,10 @@
+name: lobzikai
+
+services:
+  lecture_processor:
+    build:
+      context: ../..
+      dockerfile: apps/lecture_processor/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ../../.env

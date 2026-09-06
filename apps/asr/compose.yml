@@ -1,0 +1,10 @@
+name: lobzikai
+
+services:
+  asr:
+    build:
+      context: ../..
+      dockerfile: apps/asr/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ../../.env
