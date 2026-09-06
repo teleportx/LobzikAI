@@ -5,7 +5,7 @@ WORKDIR /app
 COPY apps/web/requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
-COPY libs/setup_logger libs/setup_logger
+COPY libs/setup_logger.py libs/setup_logger.py
 COPY libs/config.py libs/config.py
 COPY libs/brocker libs/brocker
 COPY libs/utils libs/utils
