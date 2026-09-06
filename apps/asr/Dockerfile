@@ -9,6 +9,7 @@ COPY libs/setup_logger.py libs/setup_logger.py
 COPY libs/config.py libs/config.py
 COPY libs/brocker libs/brocker
 COPY libs/processor libs/processor
+COPY libs/utils libs/utils
 
 COPY apps/asr asr
 
