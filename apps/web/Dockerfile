@@ -16,4 +16,6 @@ COPY libs/alembic libs/alembic
 COPY alembic.ini alembic.ini
 
 COPY apps/web web
+
+WORKDIR apps/web
 CMD ["fastapi", "run", "main.py"]
