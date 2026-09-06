@@ -2,7 +2,7 @@ from aiogram import Router, types
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from libs import db
+from libs import db, config
 from libs import keyboards
 
 router = Router()
@@ -20,5 +20,5 @@ async def handle_lecture_mark_edit(callback: types.CallbackQuery, dbconn: AsyncS
     )).fetchone()
 
     await callback.message.edit_reply_markup(
-        reply_markup=keyboards.lecture.get_owned(cbdata.lecture_id, callback.from_user.id, lecture.show_questions_section, lecture.show_askai_section)
+        reply_markup=keyboards.lecture.get_owned(cbdata.lecture_id, callback.from_user.id, lecture.show_questions_section, lecture.show_askai_section, config.host, config.Constants.lecture_token_ttl, config.jwt_secret)
     )
