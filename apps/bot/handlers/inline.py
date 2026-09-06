@@ -2,7 +2,7 @@ from aiogram import Router, types
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from libs import db
+from libs import db, config
 from libs import keyboards
 
 router = Router()
@@ -28,7 +28,7 @@ async def handle_inline(query: types.InlineQuery, dbconn: AsyncSession):
                 message_text=f'Lecture note <b>{lec.title}</b>\n'
                              f'<i>~ {formatted_datetime}</i>'
             ),
-            reply_markup=keyboards.lecture.get(lec.id)
+            reply_markup=keyboards.lecture.get(lec.id, config.host)
         ))
 
     await query.answer(results, cache_time=0, is_personal=True)
