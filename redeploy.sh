@@ -32,13 +32,13 @@ is_valid_service() {
 # Остановка сервиса
 down_service() {
   local service=$1
-  docker compose -f "apps/${service}-docker-compose.yml" down
+  docker compose -f "apps/${service}/compose.yml" down
 }
 
 # Запуск сервиса
 up_service() {
   local service=$1
-  docker compose -f "apps/${service}-docker-compose.yml" up -d --build
+  docker compose -f "apps/${service}/compose.yml" up -d --build
 }
 
 # Проверяем все переданные сервисы
