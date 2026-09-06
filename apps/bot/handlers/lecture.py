@@ -26,5 +26,5 @@ async def handle_lecture(message: types.Message, dbconn: AsyncSession):
     await message.reply(
         f'Lecture <b>{lecture.title}</b> panel\n'
         f'<i>~ {formatted_datetime}</i>',
-        reply_markup=keyboards.lecture.get_owned(lecture.id, lecture.owner_id, lecture.show_questions_section, lecture.show_askai_section),
+        reply_markup=keyboards.lecture.get_owned(lecture.id, lecture.owner_id, lecture.show_questions_section, lecture.show_askai_section, config.host, config.Constants.lecture_token_ttl, config.jwt_secret),
     )
