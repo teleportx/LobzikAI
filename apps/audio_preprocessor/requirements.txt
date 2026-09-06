@@ -2,3 +2,4 @@ loguru==0.7.3
 aiogram==3.29.1
 aiormq==6.9.4
 aioboto3==15.5.0
+python-dotenv==1.2.2
