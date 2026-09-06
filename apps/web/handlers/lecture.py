@@ -10,7 +10,7 @@ from starlette.templating import Jinja2Templates
 from libs import db, config
 from libs.processor.separate_processors.teacher import AsyncTeacherModel
 from libs.utils.first_get import first_get
-from libs.utils.jwt_token import AuthorizeDep
+from libs.utils.jwt_web import AuthorizeDep
 
 router = APIRouter(prefix='/lecture')
 templates = Jinja2Templates('templates')

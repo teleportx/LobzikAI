@@ -11,6 +11,7 @@ COPY libs/brocker libs/brocker
 COPY libs/utils libs/utils
 COPY libs/db libs/db
 COPY libs/keyboards libs/keyboards
+COPY libs/keyboards libs/keyboards
 
 COPY libs/alembic libs/alembic
 COPY alembic.ini alembic.ini

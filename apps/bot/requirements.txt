@@ -8,6 +8,5 @@ loguru==0.7.3
 aiormq==6.9.4
 pydantic==2.13.4
 aiohttp==3.14.1
-fastapi==0.139.0
 PyJWT==2.13.0
 redis==8.0.1
