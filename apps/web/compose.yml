@@ -6,5 +6,7 @@ services:
       context: ../..
       dockerfile: apps/web/Dockerfile
     restart: unless-stopped
+    ports:
+      - "44853:8000"
     env_file:
       - ../../.env
