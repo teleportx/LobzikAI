@@ -16,6 +16,7 @@ telegram_bot_api_server = environ.get('TELEGRAM_BOT_API_SERVER')
 model_cache_dir = environ.get("MODEL_CACHE_DIR", "./cache")
 
 use_local_asr = environ.get('USE_LOCAL_ASR', "TRUE") == "TRUE"
+use_gpu = environ.get('USE_GPU', 'TRUE') == 'TRUE'
 
 
 class Constants:

@@ -14,6 +14,7 @@ class ASRModel:
             self.model = MultiThreadSpeechToText(
                 workers=config.Constants.num_asr_workers,
                 chunk_overlapping=config.Constants.chunk_overlapping,
+                use_gpu=config.use_gpu,
             )
         else:
             raise NotImplemented
