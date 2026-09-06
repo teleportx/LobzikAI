@@ -2,10 +2,6 @@ FROM python:3.13.3-slim
 
 WORKDIR /app
 
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y \
-        build-essential ffmpeg
-
 COPY apps/asr/requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
