@@ -1,0 +1,5 @@
+loguru==0.7.3
+aiogram==3.29.1
+aiormq==6.9.4
+vosk==0.3.45
+audioop-lts==0.2.2

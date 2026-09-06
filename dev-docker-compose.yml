@@ -11,6 +11,19 @@ services:
     volumes:
       - ./.devdata/postgres:/var/lib/postgresql/data
 
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:31227:6379"
+    volumes:
+      - ./.devdata/redis:/data:/data
+    environment:
+      REDIS_PASSWORD: noer
+      REDIS_DATABASES: 1
+      REDIS_MAXMEMORY: 512mb
+      REDIS_APPENDONLY: "yes"
+
   rabbitmq:
     image: rabbitmq:3-management
     ports:
@@ -18,14 +31,3 @@ services:
       - "127.0.0.1:12516:15672"
     volumes:
       - ./.devdata/rabbitmq:/var/lib/rabbitmq
-
-  cloudflare-tunnel:
-    image: cloudflare/cloudflared
-    hostname: cloudflare-tunnel
-    restart: unless-stopped
-    command: tunnel run
-    network_mode: host
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-    environment:
-      - "TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}"

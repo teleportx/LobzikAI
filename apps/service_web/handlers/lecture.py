@@ -1,0 +1,100 @@
+import uuid
+
+from openai import AsyncOpenAI
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
+from sqlalchemy import select, update
+from starlette.requests import Request
+from starlette.templating import Jinja2Templates
+
+from libs import db, config
+from libs.processor.separate_processors.teacher import AsyncTeacherModel
+from libs.utils.first_get import first_get
+from libs.utils.jwt_token import AuthorizeDep
+
+router = APIRouter(prefix='/lecture')
+templates = Jinja2Templates('templates')
+
+client = AsyncOpenAI()
+teacher_model = AsyncTeacherModel(client=client, base_gpt_model=config.AIModels.base_gpt_model)
+
+
+class LectureEditModel(BaseModel):
+    summarized_text: str = Field(max_length=10 ** 6)
+
+
+class LectureAskModel(BaseModel):
+    question: str = Field(max_length=1000)
+
+
+async def call_teacher_model(summarized_text: str, question: str):
+    answer = await teacher_model(summarized_text, question)
+    return answer
+
+
+@router.get('/{lecture_id}')
+async def handle_lecture_html(request: Request, lecture_id: uuid.UUID):
+    return templates.TemplateResponse(request=request, name='lecture.html', context={
+        'lecture_id': lecture_id,
+    })
+
+
+@router.get('/{lecture_id}/data')
+async def handle_lecture_data(request: Request, lecture_id: uuid.UUID):
+    lecture = (await request.state.db.execute(
+        select(db.Lecture.title, db.Lecture.summarized_text, db.Lecture.show_questions_section, db.Lecture.show_askai_section)
+        .where(db.Lecture.id == lecture_id)
+    )).fetchone()
+
+    if lecture is None:
+        raise HTTPException(404, 'Lecture not found')
+
+    questions = []
+    if lecture.show_questions_section:
+        questions = first_get((await request.state.db.execute(
+            select(db.LectureTestQuestion)
+            .where(db.LectureTestQuestion.lecture_id == lecture_id)
+        )).fetchall())
+
+    return {
+        'title': lecture.title,
+        'summarized_text': lecture.summarized_text,
+        'show_questions_section': lecture.show_questions_section,
+        'show_askai_section': lecture.show_askai_section,
+
+        'questions': [{
+            'text': el.text,
+            'answer': el.answer,
+        } for el in questions]
+    }
+
+
+@router.patch('/{lecture_id}/edit', status_code=204)
+async def handle_lecture_data(request: Request, auth: AuthorizeDep('lecture'), lecture_id: uuid.UUID, body: LectureEditModel):
+    lecture = (await request.state.db.execute(
+        update(db.Lecture)
+        .where(db.Lecture.id == lecture_id, db.Lecture.owner_id == auth.get('user_id'))
+        .values(summarized_text=body.summarized_text)
+        .returning(db.Lecture.id)
+    )).fetchone()
+
+    if lecture is None:
+        raise HTTPException(404, 'Lecture not found')
+
+
+@router.post('/{lecture_id}/ask')
+async def handle_lecture_data(request: Request, lecture_id: uuid.UUID, body: LectureAskModel):
+    lecture = (await request.state.db.execute(
+        select(db.Lecture.summarized_text, db.Lecture.show_askai_section)
+        .where(db.Lecture.id == lecture_id)
+    )).fetchone()
+
+    if lecture is None:
+        raise HTTPException(404, 'Lecture not found')
+
+    if not lecture.show_askai_section:
+        raise HTTPException(403, 'Ask ai disabled for this lecture')
+
+    return {
+        'answer': (await call_teacher_model(lecture.summarized_text, body.question)).text
+    }
