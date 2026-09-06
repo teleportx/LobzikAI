@@ -96,14 +96,8 @@ RUN cd /opt/vosk-api/python && \
 
 WORKDIR /app
 
-COPY requirements.txt requirements.txt
-
-RUN pip3 install --upgrade pip setuptools wheel && \
-    pip3 install -r requirements.txt
-
-# ---------------------------------------------------------
-# Application
-# ---------------------------------------------------------
+COPY apps/asr/requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
 
 COPY libs/setup_logger.py libs/setup_logger.py
 COPY libs/config.py libs/config.py
@@ -114,5 +108,4 @@ COPY libs/utils libs/utils
 COPY apps/asr asr
 
 WORKDIR /app/asr
-
-CMD ["python3", "main.py"]
+CMD ["python", "main.py"]
