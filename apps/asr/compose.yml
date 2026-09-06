@@ -6,6 +6,10 @@ services:
       context: ../..
       dockerfile: apps/asr/Dockerfile
     restart: unless-stopped
+    gpus: all
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
     env_file:
       - ../../.env
     volumes:
