@@ -9,4 +9,4 @@ services:
     env_file:
       - ../../.env
     volumes:
-      - ../../cache:/app/cache
+      - ../../cache:/app/asr/cache
