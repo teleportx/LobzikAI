@@ -29,6 +29,7 @@ def extract_file_id(message: types.Message) -> str | None:
 
 @audio_router.message(F.audio)
 @audio_router.message(F.voice)
+@audio_router.message(F.video)
 async def handle_audio(message: types.Message, media_group_messages: list[types.Message] | None = None):
     if media_group_messages is None:
         await brocker.send_audio_to_process(message.from_user.id, extract_file_id(message))
