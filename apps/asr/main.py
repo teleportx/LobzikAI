@@ -24,7 +24,7 @@ s3_session: aiohttp.ClientSession
 model = ASRModel()
 
 
-class ASRModel(BaseModel):
+class ASRSchema(BaseModel):
     owner_id: int
     created_at: datetime
     audio_link: str
@@ -32,7 +32,7 @@ class ASRModel(BaseModel):
 
 async def on_message(message: DeliveredMessage):
     try:
-        body = ASRModel.model_validate_json(message.body)
+        body = ASRSchema.model_validate_json(message.body)
 
     except ValidationError as e:
         logger.warning(f'Invalid message received: {message.body.decode()}\n{e}')
