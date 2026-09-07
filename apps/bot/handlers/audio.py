@@ -24,12 +24,16 @@ def extract_file_id(message: types.Message) -> str | None:
     elif message.video is not None:
         file_id = message.video.file_id
 
+    elif message.document is not None:
+        file_id = message.document.file_id
+
     return file_id
 
 
 @audio_router.message(F.audio)
 @audio_router.message(F.voice)
 @audio_router.message(F.video)
+@audio_router.message(F.document)
 async def handle_audio(message: types.Message, media_group_messages: list[types.Message] | None = None):
     if media_group_messages is None:
         await brocker.send_audio_to_process(message.from_user.id, extract_file_id(message))
