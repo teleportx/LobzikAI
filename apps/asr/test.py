@@ -1,11 +1,12 @@
 import sys
+import time
 
 sys.path.append('.')
 sys.path.append('service_asr')
 
 import asyncio
 
-from multi_thread_asr import MultiThreadSpeechToText
+from asr import ASRModel
 
 
 def read_audio():
@@ -13,9 +14,13 @@ def read_audio():
         return audio_file.read()
 
 
-audio_path = "Обществознание.wav"
+audio_path = "История.wav"
 
-model = MultiThreadSpeechToText(workers=8, chunk_overlapping=2.0, use_gpu=True)
+model = ASRModel()
 encoded_audio = read_audio()
+print("Processing started")
+start = time.time()
 result = asyncio.run(model(encoded_audio))
+end = time.time()
 print(result)
+print(f"Processed in {end - start} seconds")

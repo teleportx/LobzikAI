@@ -18,8 +18,6 @@ s3_session = aioboto3.Session(config.S3.access_key, config.S3.secret_key)
 
 
 def build_filter_complex(n: int) -> str:
-    """CHUDO AHHAHA"""
-
     parts = []
     labels = []
     for i in range(n):
