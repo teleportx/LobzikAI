@@ -100,4 +100,4 @@ async def handle_audio_process_union(callback: types.CallbackQuery):
     file_ids = file_ids_raw.decode().split(',')
 
     await brocker.send_audio_to_process(callback.from_user.id, *file_ids)
-    await callback.message.edit_text('<tg-emoji emoji-id="5440621591387980068">🔜</tg-emoji> Attachments have been sent for joint processing. Your lecture will be ready in several minutes')
+    await callback.message.edit_text('<tg-emoji emoji-id="5393501634032575141">🔜</tg-emoji> Attachments have been sent for joint processing. Your lecture will be ready in several minutes')
