@@ -27,13 +27,20 @@ from .conditions import (
 
 from ..schemas import ProcessorResponseModel, SummarizerAIModel, SummarizerResponseModel
 
+from libs.config import AIModels, debug
+
 
 class SummarizerAgent:
-    def __init__(self, base_gpt_model: str, sum_model: str, debug: bool):
+    def __init__(
+            self,
+            base_gpt_model: str = AIModels.base_gpt_model,
+            sum_model: str = AIModels.sum_model,
+            is_debug: bool = debug,
+    ):
         self.smith_client = Client()
         self.agent_config = RunnableConfig(
             run_name="assistant_graph",
-            tags=["lecture_processor", "DEBUG" if debug else "PROD"],
+            tags=["lecture_processor", "DEBUG" if is_debug else "PROD"],
             metadata={
                 "agent_version": "v0.0.0",
             },
@@ -48,6 +55,7 @@ class SummarizerAgent:
 
         graph.add_conditional_edges(START, start_continue_condition)
         graph.add_edge("summarize", "title_maker")
+        graph.add_edge("regenerate", "title_maker")
         graph.add_conditional_edges("summarize", generate_tests_condition)
         graph.add_conditional_edges("regenerate", regenerate_tests_condition)
         graph.add_edge("title_maker", END)
