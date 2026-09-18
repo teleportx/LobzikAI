@@ -2,7 +2,6 @@ import asyncio
 import base64
 import time
 
-from libs.processor.separate_processors import LectureProcessor
 from libs.processor.summarizer_agent import SummarizerAgent
 
 
@@ -12,24 +11,15 @@ def encode_audio_to_base64(audio_path):
         return base64.b64encode(audio_file.read()).decode('utf-8')
 
 
-async def call_summarizer(file_name: str):
-    return await model(audio_base64=encode_audio_to_base64(file_name))
-
-
-async def call_sum_sep(text: str):
-    return await model.summarizer(text=text)
-
-
 async def call_agent_sum(text: str):
     return await agent(extracted_text=text, make_test=True)
 
 audio_file_path = "Обществознание.mp3"
 
-model = LectureProcessor()
 agent = SummarizerAgent()
 
 sample_text="""
-динаміка. Итак, социальная динамика общества. 
+Итак, социальная динамика общества. 
 Значит, мы говорили о том, что общество - это сложная структура, которая постоянно изменяется. 
 Причём мы с вами говорили о том, что эти изменения происходят одновременно в разных направлениях, в разных сферах. 
 Вот сегодня попробуем это рассмотреть. 
@@ -72,6 +62,7 @@ start = time.time()
 result = asyncio.run(call_agent_sum(text=sample_text))
 print(result.summarizer_response.ai_response)
 print(result.test_maker_response)
+print(result.summarizer_response.ai_response.title)
 print(result.total_cost)
 end = time.time()
 

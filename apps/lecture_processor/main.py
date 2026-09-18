@@ -81,7 +81,11 @@ async def main():
     global lecture_processor
 
     db.base.start(config.db_url, config.debug, config.Constants.db_pool_max_size)
-    lecture_processor = SummarizerAgent(config.AIModels.base_gpt_model, config.AIModels.sum_model, config.AIModels.asr_model)
+    lecture_processor = SummarizerAgent(
+        config.AIModels.base_gpt_model,
+        config.AIModels.sum_model,
+        config.debug,
+    )
 
     channel = await (await brocker.get_connection()).channel()
     await channel.basic_qos(prefetch_count=3)
