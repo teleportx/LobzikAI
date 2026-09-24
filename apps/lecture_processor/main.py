@@ -34,7 +34,6 @@ async def on_message(message: DeliveredMessage):
 
     result = await lecture_processor(
         extracted_text=body["asr_result"],
-        make_test=True,
     )
 
     async with db.base.Session() as session:
