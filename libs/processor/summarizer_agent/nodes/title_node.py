@@ -6,13 +6,13 @@ from ...summarizer_agent.utils import count_request_cost
 
 system_prompt = """You are an assistant who makes titles.
 You are provided summarized version of some lecture. Your task - give a short title.
-Title must be shorter than 5 words, but represent main reason of lecture."""
+Title must be shorter than 5 words, but represent main reason of lecture.
+Also title must be on the same language as the lecture. Don't use thinking at all"""
 
 
 def create_title_node(base_gpt_model: str):
     model = ChatOpenAI(
         model=base_gpt_model,
-        max_completion_tokens=32,
         reasoning_effort="low",
     )
 

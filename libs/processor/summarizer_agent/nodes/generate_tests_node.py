@@ -16,6 +16,7 @@ def create_generate_tests_node(base_gpt_model: str):
     model = ChatOpenAI(model=base_gpt_model).with_structured_output(
         schema=TestMakerResponseModel,
         include_raw=True,
+        reasoning_effort="none",
     )
 
     async def generate_tests_node(state: AgentState):
