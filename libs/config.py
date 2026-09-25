@@ -30,7 +30,7 @@ class Constants:
 
 class AIModels:
     sum_model = environ.get("SUMMARIZATION_MODEL", "gpt-5-mini")
-    base_gpt_model = environ.get("BASE_GPT_MODEL", "gpt-5-nano")
+    base_gpt_model = environ.get("BASE_GPT_MODEL", "deepseek-v4-flash")
 
 
 class S3:
