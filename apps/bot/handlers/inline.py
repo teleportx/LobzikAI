@@ -14,6 +14,7 @@ async def handle_inline(query: types.InlineQuery, dbconn: AsyncSession):
         select(db.Lecture.id, db.Lecture.title, db.Lecture.created_at)
         .where(db.Lecture.owner_id == query.from_user.id)
         .order_by(db.Lecture.created_at.desc())
+        .limit(10)
     )).fetchall()
 
     results = []
