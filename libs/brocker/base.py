@@ -1,6 +1,7 @@
 import asyncio
+import weakref
 from contextlib import asynccontextmanager
-from typing import Optional
+from typing import Optional, AsyncIterator
 
 import aiormq
 from aiormq.abc import AbstractConnection, AbstractChannel
@@ -11,131 +12,223 @@ from libs import config
 
 class BrokerConnectionManager:
     def __init__(
-        self,
-        url: str,
-        pool_size: int = 16,
-        reconnect_delay: float = 5.0,
+            self,
+            url: str,
+            pool_size: int = 16,
+            reconnect_delay: float = 5.0,
+            health_check_interval: float = 15.0,
+            health_check_timeout: float = 5.0,
+            connect_timeout: float = 10.0,
+            close_timeout: float = 5.0,
     ) -> None:
         self._url = url
         self._pool_size = pool_size
         self._reconnect_delay = reconnect_delay
+        self._health_check_interval = health_check_interval
+        self._health_check_timeout = health_check_timeout
+        self._connect_timeout = connect_timeout
+        self._close_timeout = close_timeout
 
         self._connection: AbstractConnection | None = None
-
         self._connection_lock = asyncio.Lock()
-        self._pool_init_lock = asyncio.Lock()
 
-        self._pool: asyncio.Queue[AbstractChannel] = asyncio.Queue()
-        self._pool_initialized = False
+        self._owners: weakref.WeakKeyDictionary[
+            AbstractChannel, AbstractConnection
+        ] = weakref.WeakKeyDictionary()
+
+        self._pool: asyncio.Queue[AbstractChannel | None] = asyncio.Queue()
+        for _ in range(self._pool_size):
+            self._pool.put_nowait(None)
+
+        self._wake = asyncio.Event()
+        self._watchdog_task: asyncio.Task | None = None
+
+    # ------------------------------------------------------------------ #
+    # lifecycle
+    # ------------------------------------------------------------------ #
 
     async def start(self) -> None:
-        await self._ensure_pool()
+        await self.get_connection()
+
+        if self._watchdog_task is None or self._watchdog_task.done():
+            self._watchdog_task = asyncio.create_task(
+                self._watchdog(),
+                name='broker-connection-watchdog',
+            )
 
     async def stop(self) -> None:
-        channels = []
+        task, self._watchdog_task = self._watchdog_task, None
+        if task is not None:
+            task.cancel()
+            await asyncio.gather(task, return_exceptions=True)
 
-        while not self._pool.empty():
+        drained = 0
+        channels: list[AbstractChannel] = []
+        while True:
             try:
-                channels.append(self._pool.get_nowait())
+                slot = self._pool.get_nowait()
             except asyncio.QueueEmpty:
                 break
+            drained += 1
+            if slot is not None:
+                channels.append(slot)
 
         for channel in channels:
-            try:
-                if not channel.is_closed:
-                    await channel.close()
-            except Exception:
-                pass
+            await self._safe_close(channel)
 
-        if self._connection and not self._connection.is_closed:
-            try:
-                await self._connection.close()
-            except Exception:
-                pass
+        connection, self._connection = self._connection, None
+        if connection is not None:
+            await self._safe_close(connection)
 
-        self._connection = None
-        self._pool_initialized = False
+        for _ in range(drained):
+            self._pool.put_nowait(None)
+
+    # ------------------------------------------------------------------ #
+    # connection
+    # ------------------------------------------------------------------ #
+
+    async def _safe_close(self, obj: AbstractConnection | AbstractChannel) -> None:
+        try:
+            if obj.is_closed:
+                return
+            await asyncio.wait_for(obj.close(), self._close_timeout)
+        except Exception:
+            logger.debug('Error while closing %r', obj, exc_info=True)
 
     async def _connect(self) -> AbstractConnection:
         while True:
             try:
-                return await aiormq.connect(self._url)
+                return await asyncio.wait_for(
+                    aiormq.connect(self._url),
+                    self._connect_timeout,
+                )
             except Exception:
                 logger.exception('Error while aiormq connecting')
                 await asyncio.sleep(self._reconnect_delay)
 
     async def get_connection(self) -> AbstractConnection:
-        if self._connection and not self._connection.is_closed:
-            return self._connection
+        connection = self._connection
+        if connection is not None and not connection.is_closed:
+            return connection
 
         async with self._connection_lock:
-            if self._connection and not self._connection.is_closed:
-                return self._connection
+            connection = self._connection
+            if connection is not None and not connection.is_closed:
+                return connection
 
+            logger.info('Connecting to broker')
             self._connection = await self._connect()
-
-            self._pool_initialized = False
-
-            while not self._pool.empty():
-                try:
-                    self._pool.get_nowait()
-                except asyncio.QueueEmpty:
-                    break
-
+            logger.info('Connected to broker')
             return self._connection
+
+    async def _drop_connection(self, connection: AbstractConnection) -> None:
+        async with self._connection_lock:
+            if self._connection is connection:
+                self._connection = None
+
+        await self._safe_close(connection)
+
+    # ------------------------------------------------------------------ #
+    # health check
+    # ------------------------------------------------------------------ #
+
+    async def _probe(self, connection: AbstractConnection) -> None:
+        channel = await connection.channel()
+        try:
+            await channel.basic_qos(prefetch_count=0)
+        finally:
+            if not channel.is_closed:
+                try:
+                    await channel.close()
+                except Exception:
+                    pass
+
+    async def _check_health(self) -> None:
+        connection = self._connection
+
+        if connection is None or connection.is_closed:
+            logger.warning('Broker connection is closed, reconnecting')
+            await self.get_connection()
+            return
+
+        try:
+            await asyncio.wait_for(
+                self._probe(connection),
+                self._health_check_timeout,
+            )
+        except Exception:
+            logger.warning(
+                'Broker health check failed, reconnecting',
+                exc_info=True,
+            )
+            await self._drop_connection(connection)
+            await self.get_connection()
+
+    async def _watchdog(self) -> None:
+        while True:
+            try:
+                try:
+                    await asyncio.wait_for(
+                        self._wake.wait(),
+                        self._health_check_interval,
+                    )
+                except asyncio.TimeoutError:
+                    pass
+                self._wake.clear()
+
+                await self._check_health()
+            except asyncio.CancelledError:
+                raise
+            except Exception:
+                logger.exception('Broker watchdog iteration failed')
+                await asyncio.sleep(self._reconnect_delay)
+
+    # ------------------------------------------------------------------ #
+    # channels
+    # ------------------------------------------------------------------ #
 
     async def _create_channel(self) -> AbstractChannel:
         connection = await self.get_connection()
 
-        channel = await connection.channel(
-            publisher_confirms=True,
+        channel = await asyncio.wait_for(
+            connection.channel(publisher_confirms=True),
+            self._health_check_timeout,
         )
-
+        self._owners[channel] = connection
         return channel
 
-    async def _ensure_pool(self) -> None:
-        if self._pool_initialized:
-            return
-
-        async with self._pool_init_lock:
-            if self._pool_initialized:
-                return
-
-            await self.get_connection()
-
-            for _ in range(self._pool_size):
-                channel = await self._create_channel()
-                await self._pool.put(channel)
-
-            self._pool_initialized = True
-
     async def _validate_channel(
-        self,
-        channel: AbstractChannel,
+            self,
+            channel: AbstractChannel | None,
     ) -> AbstractChannel:
-        if channel.is_closed:
+        if channel is None or channel.is_closed:
             return await self._create_channel()
 
-        if self._connection is None:
+        connection = self._connection
+        if connection is None or connection.is_closed:
             return await self._create_channel()
 
-        if self._connection.is_closed:
+        if self._owners.get(channel) is not connection:
             return await self._create_channel()
 
         return channel
 
     @asynccontextmanager
-    async def acquire_channel(self):
-        await self._ensure_pool()
-
-        channel = await self._pool.get()
+    async def acquire_channel(self) -> AsyncIterator[AbstractChannel]:
+        slot = await self._pool.get()
+        channel: AbstractChannel | None = slot
 
         try:
-            channel = await self._validate_channel(channel)
+            channel = await self._validate_channel(slot)
             yield channel
+        except Exception:
+            self._wake.set()
+            raise
         finally:
-            if not channel.is_closed:
-                await self._pool.put(channel)
+            if channel is not None and not channel.is_closed:
+                self._pool.put_nowait(channel)
+            else:
+                self._pool.put_nowait(None)
 
 
 class ConnectionStorer:
