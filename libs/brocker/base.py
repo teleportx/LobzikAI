@@ -213,6 +213,15 @@ class BrokerConnectionManager:
 
         return channel
 
+    def is_channel_alive(self, channel: AbstractChannel) -> bool:
+        connection = self._connection
+        return (
+                not channel.is_closed
+                and connection is not None
+                and not connection.is_closed
+                and self._owners.get(channel) is connection
+        )
+
     @asynccontextmanager
     async def acquire_channel(self) -> AsyncIterator[AbstractChannel]:
         slot = await self._pool.get()
@@ -222,9 +231,11 @@ class BrokerConnectionManager:
             channel = await self._validate_channel(slot)
             yield channel
         except Exception:
+
             self._wake.set()
             raise
         finally:
+
             if channel is not None and not channel.is_closed:
                 self._pool.put_nowait(channel)
             else:
